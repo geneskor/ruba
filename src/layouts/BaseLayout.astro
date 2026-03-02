@@ -1,0 +1,60 @@
+---
+import '../styles/global.css';
+
+const { title, description } = Astro.props;
+const pathnameRaw = Astro.url?.pathname ?? '/';
+const normalize = (path) => (path.length > 1 && path.endsWith('/') ? path.slice(0, -1) : path);
+const pathname = normalize(pathnameRaw);
+
+const navItems = [
+  { label: 'Главная', href: '/' },
+  { label: 'Каталог', href: '/ryba/' },
+  { label: 'О компании', href: '/about/' },
+  { label: 'Контакты', href: '/contacts/' }
+];
+
+const isActive = (href) => {
+  if (href === '/ryba/') {
+    return pathname.startsWith('/ryba');
+  }
+  return pathname === normalize(href);
+};
+---
+
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    {description ? <meta name="description" content={description} /> : null}
+    <slot name="head" />
+  </head>
+  <body class="min-h-screen">
+    <header class="border-b">
+      <div class="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
+        <a class="text-base font-semibold" href="/">Rybavprud</a>
+        <nav class="flex flex-wrap gap-4 text-sm">
+          {navItems.map((item) => (
+            <a
+              href={item.href}
+              aria-current={isActive(item.href) ? 'page' : undefined}
+              class={`hover:underline ${
+                isActive(item.href) ? 'font-semibold text-black underline' : 'text-gray-700'
+              }`}
+            >
+              {item.label}
+            </a>
+          ))}
+        </nav>
+      </div>
+    </header>
+    <main class="px-6 py-10">
+      <slot />
+    </main>
+    <footer class="border-t">
+      <div class="mx-auto max-w-6xl px-6 py-6 text-sm text-gray-600">
+        (c) Rybavprud
+      </div>
+    </footer>
+  </body>
+</html>

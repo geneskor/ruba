@@ -1,0 +1,50 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import categories from '../../data/categories.json';
+import fish from '../../data/fish.json';
+
+const categoryMap = Object.fromEntries(
+  categories.map((category) => [category.slug, category.title])
+);
+---
+
+<BaseLayout title="Каталог рыбы">
+  <div class="max-w-5xl">
+    <h1 class="text-3xl font-bold">Каталог рыбы</h1>
+    <p class="mt-3 text-base opacity-80">
+      Подборка рыбы для зарыбления, товарных водоёмов и декоративных проектов.
+    </p>
+  </div>
+
+  <section class="mt-8">
+    <h2 class="text-2xl font-semibold">Категории</h2>
+    <div class="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      {categories.map((category) => (
+        <a
+          href={`/ryba/${category.slug}/`}
+          class="block rounded-xl border p-4 hover:shadow-sm"
+        >
+          <h3 class="text-lg font-semibold">{category.title}</h3>
+          <p class="mt-2 text-sm opacity-70">Смотреть виды</p>
+        </a>
+      ))}
+    </div>
+  </section>
+
+  <section class="mt-10">
+    <h2 class="text-2xl font-semibold">Все виды</h2>
+    <div class="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      {fish.map((item) => (
+        <a
+          href={`/ryba/${item.category}/${item.slug}/`}
+          class="block rounded-xl border p-4 hover:shadow-sm"
+        >
+          <h3 class="text-lg font-semibold">{item.name}</h3>
+          <p class="mt-2 text-sm opacity-80">{item.desc}</p>
+          <p class="mt-3 text-sm opacity-70">{categoryMap[item.category]}</p>
+          <p class="mt-3 font-medium">{item.priceFrom}</p>
+        </a>
+      ))}
+    </div>
+  </section>
+</BaseLayout>

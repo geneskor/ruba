@@ -2,18 +2,197 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 ---
 
-<BaseLayout title="Контакты">
-  <div class="max-w-3xl">
-    <h1 class="text-3xl font-bold">Контакты</h1>
-    <p class="mt-4 text-lg opacity-80">
-      Укажите актуальные способы связи и время ответа. Этот раздел лучше держать
-      максимально точным.
-    </p>
-    <div class="mt-6 space-y-3">
-      <p>Телефон: +7 (000) 000-00-00</p>
-      <p>Email: info@example.com</p>
-      <p>Адрес: г. Город, ул. Примерная, 1</p>
-      <p>График: Пн–Пт, 09:00–18:00</p>
+<BaseLayout
+  title="Контакты"
+  description="Свяжитесь с нами любым удобным способом — поможем с подбором рыбы и кормов, рассчитаем объём и согласуем доставку."
+  hero
+>
+  <section
+    slot="hero"
+    class="relative overflow-hidden bg-[linear-gradient(135deg,_#0b1f2a_0%,_#123247_55%,_#07131b_100%)] text-white"
+  >
+    <div class="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(255,255,255,0.16),_transparent_55%)]"></div>
+    <div class="pointer-events-none absolute -right-16 -top-20 h-64 w-64 rounded-full bg-[color:rgba(79,188,198,0.28)] blur-3xl"></div>
+    <div class="relative mx-auto max-w-6xl px-6 pt-32 pb-16 sm:pt-36 sm:pb-20 lg:pt-40">
+      <h1 class="text-4xl font-semibold leading-tight sm:text-5xl">
+        Контакты
+      </h1>
+      <p class="mt-4 text-base text-white/80 sm:text-lg">
+        Свяжитесь с нами любым удобным способом — поможем с подбором рыбы и кормов,
+        рассчитаем объём и согласуем доставку.
+      </p>
+    </div>
+  </section>
+
+  <div class="contacts-page text-[var(--color-text)]">
+
+    <div class="bg-[var(--color-bg)] px-6">
+      <section class="mx-auto max-w-6xl py-12 sm:py-14">
+        <div class="cards-grid grid gap-6 lg:grid-cols-3">
+          <a
+            class="contact-card focus-ring block border border-[var(--brand-accent-border)] bg-white/90 p-6 text-center transition hover:-translate-y-1 hover:shadow-[0_22px_46px_rgba(15,10,5,0.16)]"
+            href="https://maps.google.com/?q=Нахабино+улица+Володарского+3Б"
+            target="_blank"
+            rel="noreferrer"
+            aria-label="Нахабино, улица Володарского д.3Б"
+          >
+            <div class="mx-auto grid h-14 w-14 place-items-center rounded-full text-[var(--color-primary)]" aria-hidden="true">
+              <svg viewBox="0 0 24 24" role="img" aria-hidden="true">
+                <path
+                  d="M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11Z"
+                  stroke="currentColor"
+                  stroke-width="1.6"
+                  fill="none"
+                />
+                <circle cx="12" cy="10" r="2.6" stroke="currentColor" stroke-width="1.6" fill="none" />
+              </svg>
+            </div>
+            <h2 class="mt-4 text-xs font-semibold uppercase tracking-[0.3em] text-[var(--color-muted)]">
+              АДРЕС
+            </h2>
+            <p class="mt-3 text-lg font-semibold text-[var(--color-primary)] transition hover:text-[var(--color-primary-dark)]">
+              Нахабино, улица Володарского д.3Б
+            </p>
+          </a>
+
+          <a
+            class="contact-card focus-ring block border border-[var(--brand-accent-border)] bg-white/90 p-6 text-center transition hover:-translate-y-1 hover:shadow-[0_22px_46px_rgba(15,10,5,0.16)]"
+            href="tel:+79993380337"
+            aria-label="+7 (999) 338-0-337"
+          >
+            <div class="mx-auto grid h-14 w-14 place-items-center rounded-full text-[var(--color-primary)]" aria-hidden="true">
+              <svg viewBox="0 0 24 24" role="img" aria-hidden="true">
+                <path
+                  d="M5 4h4l2.2 5-2.2 1.2c1.7 3.3 4.1 5.7 7.4 7.4l1.2-2.2 5 2.2v4c-9.4 0-17-7.6-17-17Z"
+                  stroke="currentColor"
+                  stroke-width="1.6"
+                  stroke-linejoin="round"
+                  fill="none"
+                />
+              </svg>
+            </div>
+            <h2 class="mt-4 text-xs font-semibold uppercase tracking-[0.3em] text-[var(--color-muted)]">
+              ТЕЛЕФОН
+            </h2>
+            <p class="mt-3 text-lg font-semibold text-[var(--color-primary)] transition hover:text-[var(--color-primary-dark)]">
+              +7 (999) 338-0-337
+            </p>
+          </a>
+
+          <a
+            class="contact-card focus-ring block border border-[var(--brand-accent-border)] bg-white/90 p-6 text-center transition hover:-translate-y-1 hover:shadow-[0_22px_46px_rgba(15,10,5,0.16)]"
+            href="mailto:rybazdesest@mail.ru"
+            aria-label="rybazdesest@mail.ru"
+          >
+            <div class="mx-auto grid h-14 w-14 place-items-center rounded-full text-[var(--color-primary)]" aria-hidden="true">
+              <svg viewBox="0 0 24 24" role="img" aria-hidden="true">
+                <rect
+                  x="3"
+                  y="6"
+                  width="18"
+                  height="12"
+                  rx="2"
+                  stroke="currentColor"
+                  stroke-width="1.6"
+                  fill="none"
+                />
+                <path
+                  d="M3.5 7.2 12 13l8.5-5.8"
+                  stroke="currentColor"
+                  stroke-width="1.6"
+                  stroke-linecap="round"
+                  fill="none"
+                />
+              </svg>
+            </div>
+            <h2 class="mt-4 text-xs font-semibold uppercase tracking-[0.3em] text-[var(--color-muted)]">
+              EMAIL
+            </h2>
+            <p class="mt-3 text-lg font-semibold text-[var(--color-primary)] transition hover:text-[var(--color-primary-dark)]">
+              rybazdesest@mail.ru
+            </p>
+          </a>
+        </div>
+      </section>
+
+      <section class="mx-auto max-w-6xl pb-12">
+        <div class="schedule-card border border-[var(--brand-accent-border)] bg-white/90 px-6 py-8 text-center">
+          <h2 class="text-xs font-semibold uppercase tracking-[0.3em] text-[var(--color-muted)]">
+            ГРАФИК РАБОТЫ
+          </h2>
+          <p class="mt-3 text-2xl font-semibold text-[var(--color-primary)]">Ежедневно 24/7</p>
+        </div>
+      </section>
+
+      <section class="mx-auto max-w-6xl pb-16">
+        <div class="map-card border border-[var(--brand-accent-border)] bg-white/90">
+          <!-- TODO: замените src на актуальную ссылку карты -->
+          <iframe
+            title="Нахабино, улица Володарского д.3Б"
+            class="map-frame focus-ring"
+            loading="lazy"
+            referrerpolicy="no-referrer-when-downgrade"
+            src="https://www.google.com/maps?q=Нахабино,+улица+Володарского+3Б&output=embed"
+          ></iframe>
+        </div>
+      </section>
     </div>
   </div>
+
+  <style>
+    .contacts-page {
+      --color-primary: var(--brand-accent);
+      --color-primary-dark: var(--brand-accent-dark);
+      --color-bg: #f0fbfc;
+      --color-text: #1b1b1b;
+      --color-muted: #6b7280;
+      --radius: 24px;
+      --shadow: 0 16px 32px rgba(15, 10, 5, 0.08);
+    }
+
+    .contact-card,
+    .schedule-card,
+    .map-card {
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+
+    .map-frame {
+      width: 100%;
+      min-height: 360px;
+      border: 0;
+      display: block;
+    }
+
+    .focus-ring:focus-visible {
+      outline: 2px solid var(--color-primary);
+      outline-offset: 4px;
+      border-radius: 8px;
+    }
+
+    @media (min-width: 1024px) {
+      .cards-grid {
+        position: relative;
+      }
+
+      .cards-grid::before,
+      .cards-grid::after {
+        content: '';
+        position: absolute;
+        top: 16px;
+        bottom: 16px;
+        width: 1px;
+        background: var(--color-primary);
+        opacity: 0.22;
+      }
+
+      .cards-grid::before {
+        left: calc(33.333% - 0.5px);
+      }
+
+      .cards-grid::after {
+        left: calc(66.666% - 0.5px);
+      }
+    }
+  </style>
 </BaseLayout>

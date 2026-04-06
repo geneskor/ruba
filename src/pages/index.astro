@@ -1,18 +1,198 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import ProductCard from '../components/ProductCard.astro';
+import ArticleCard from '../components/ArticleCard.astro';
+import ryba from '../data/catalog/ryba.json';
+import blog from '../data/blog.json';
+
+const featured = ryba.products.slice(0, 10);
+const latestPosts = [...blog.posts]
+  .sort((a, b) => new Date(b.date ?? 0).getTime() - new Date(a.date ?? 0).getTime())
+  .slice(0, 3);
 ---
 
-<BaseLayout title="Главная">
-  <section class="max-w-3xl">
-    <h1 class="text-4xl font-bold">Rybavprud</h1>
-    <p class="mt-4 text-lg opacity-80">
-      Короткое описание компании и ключевого предложения. Заполните этот блок
-      актуальной информацией.
-    </p>
-    <div class="mt-6 flex flex-wrap gap-3">
-      <a class="inline-block rounded-lg border px-4 py-2" href="/ryba/">Каталог</a>
-      <a class="inline-block rounded-lg border px-4 py-2" href="/about/">О компании</a>
-      <a class="inline-block rounded-lg border px-4 py-2" href="/contacts/">Контакты</a>
+<BaseLayout
+  title="Главная"
+  description="Рыба для зарыбления прудов в Москве и области: подбор видов, консультация и доставка."
+  hero
+>
+  <section
+    slot="hero"
+    class="relative overflow-hidden bg-[linear-gradient(135deg,_#0b1f2a_0%,_#123247_55%,_#07131b_100%)] text-white"
+  >
+    <div class="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(255,255,255,0.16),_transparent_55%)]"></div>
+    <div class="pointer-events-none absolute -right-20 -top-24 h-72 w-72 rounded-full bg-[color:rgba(79,188,198,0.28)] blur-3xl"></div>
+    <div class="relative mx-auto max-w-6xl px-6 pt-32 pb-16 sm:pt-36 sm:pb-20 lg:pt-40">
+      <p class="inline-flex items-center gap-2 rounded-full border border-white/30 px-3 py-1 text-xs uppercase tracking-[0.3em] text-white/70">
+        Главная
+      </p>
+      <h1 class="mt-4 text-4xl font-semibold leading-tight sm:text-5xl">
+        Рыба здесь - есть!
+      </h1>
+      <p class="mt-4 text-base text-white/80 sm:text-lg">
+        Рыба для зарыбления: мальки и взрослые особи для дачных прудов, озёр и других типов водоёмов.
+      </p>
     </div>
   </section>
+
+  <section class="mx-auto mt-12 max-w-6xl">
+      <div class="flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <p class="text-xs font-semibold uppercase tracking-[0.3em] text-[var(--brand-accent)]">Подборка</p>
+          <h2 class="mt-2 text-2xl font-semibold">Выбор клиентов</h2>
+          <p class="mt-2 text-sm text-gray-600">Популярные позиции для быстрого заказа.</p>
+        </div>
+        <a
+          class="rounded-full border border-[var(--brand-accent-border)] px-4 py-2 text-sm font-semibold text-[var(--brand-accent-dark)] transition hover:border-[var(--brand-accent)] hover:bg-[var(--brand-accent-soft)]"
+          href="/ryba/"
+        >
+          Перейти в каталог
+        </a>
+      </div>
+
+      <div class="mt-6 -mx-6 overflow-x-auto pb-4">
+        <div class="catalog-strip flex snap-x snap-mandatory gap-4 px-6">
+          {featured.map((item) => (
+            <div class="snap-start min-w-[220px] sm:min-w-[260px] md:min-w-[280px] lg:min-w-[300px]">
+              <ProductCard product={item} href={`/ryba/${item.category}/${item.slug}/`} compact />
+            </div>
+          ))}
+        </div>
+      </div>
+  </section>
+
+  <div class="mx-auto mt-12 max-w-6xl">
+      <div class="h-px bg-[var(--brand-accent-border)]"></div>
+  </div>
+
+  <section class="relative mx-auto mt-16 max-w-6xl">
+      <div class="pointer-events-none absolute -left-16 -top-12 h-40 w-40 rounded-full bg-[var(--brand-accent)]/15 blur-3xl"></div>
+      <svg
+        class="pointer-events-none absolute -right-6 -top-12 h-24 w-24 text-[color:rgba(79,188,198,0.6)]"
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.4"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
+      >
+        <path d="M22 7s-5.646 10 -12.308 10c-3.226 .025 -6.194 -1.905 -7.692 -5c1.498 -3.095 4.466 -5.025 7.692 -5c6.662 0 12.308 10 12.308 10" />
+      </svg>
+      <div class="grid gap-10 lg:grid-cols-[280px_minmax(0,1fr)] lg:items-start">
+        <div>
+          <p class="text-xs font-semibold uppercase tracking-[0.3em] text-[var(--brand-accent)]">Преимущества</p>
+          <h2 class="mt-3 text-3xl font-semibold text-gray-900">Почему выбирают нас</h2>
+          <p class="mt-3 text-sm text-gray-600">
+            Коротко о ключевых причинах, почему клиенты возвращаются к нам снова.
+          </p>
+        </div>
+        <div class="grid gap-4 sm:grid-cols-2">
+          <article class="rounded-2xl border border-[var(--brand-accent-border)] bg-white/90 p-5 shadow-[0_16px_32px_rgba(15,10,5,0.08)] transition hover:-translate-y-1 hover:shadow-[0_22px_40px_rgba(15,10,5,0.16)]">
+            <div class="flex items-center gap-3">
+              <div class="grid h-10 w-10 place-items-center rounded-full bg-[var(--brand-accent-soft)] text-[var(--brand-accent)]" aria-hidden="true">
+                <svg viewBox="0 0 24 24" class="h-5 w-5">
+                  <path d="M3 12c3-3 6-4.5 9-4.5S18 9 21 12c-3 3-6 4.5-9 4.5S6 15 3 12Z" fill="none" stroke="currentColor" stroke-width="1.6" />
+                  <circle cx="12" cy="12" r="1.8" fill="currentColor" />
+                </svg>
+              </div>
+              <p class="text-xs font-semibold uppercase tracking-[0.28em] text-gray-500">Качество</p>
+            </div>
+            <p class="mt-3 text-sm text-gray-700">
+              <span class="font-semibold text-gray-900">Здоровая рыба</span> — чистые бассейны, стабильная температура, качественный корм.
+            </p>
+          </article>
+
+          <article class="rounded-2xl border border-[var(--brand-accent-border)] bg-white/90 p-5 shadow-[0_16px_32px_rgba(15,10,5,0.08)] transition hover:-translate-y-1 hover:shadow-[0_22px_40px_rgba(15,10,5,0.16)]">
+            <div class="flex items-center gap-3">
+              <div class="grid h-10 w-10 place-items-center rounded-full bg-[var(--brand-accent-soft)] text-[var(--brand-accent)]" aria-hidden="true">
+                <svg viewBox="0 0 24 24" class="h-5 w-5">
+                  <path d="M12 6v6l3 2" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+                  <circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="1.6" />
+                </svg>
+              </div>
+              <p class="text-xs font-semibold uppercase tracking-[0.28em] text-gray-500">Опыт</p>
+            </div>
+            <p class="mt-3 text-sm text-gray-700">
+              <span class="font-semibold text-gray-900">25+ лет опыта</span> — специализация на разведении и продаже пресноводной рыбы.
+            </p>
+          </article>
+
+          <article class="rounded-2xl border border-[var(--brand-accent-border)] bg-white/90 p-5 shadow-[0_16px_32px_rgba(15,10,5,0.08)] transition hover:-translate-y-1 hover:shadow-[0_22px_40px_rgba(15,10,5,0.16)]">
+            <div class="flex items-center gap-3">
+              <div class="grid h-10 w-10 place-items-center rounded-full bg-[var(--brand-accent-soft)] text-[var(--brand-accent)]" aria-hidden="true">
+                <svg viewBox="0 0 24 24" class="h-5 w-5">
+                  <rect x="3" y="7" width="11" height="8" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.6" />
+                  <path d="M14 10h4l2 3v2h-6z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+                  <circle cx="7" cy="18" r="2" fill="none" stroke="currentColor" stroke-width="1.6" />
+                  <circle cx="17" cy="18" r="2" fill="none" stroke="currentColor" stroke-width="1.6" />
+                  <path d="M1.5 10.5h3.5M1 13h3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+                </svg>
+              </div>
+              <p class="text-xs font-semibold uppercase tracking-[0.28em] text-gray-500">Доставка</p>
+            </div>
+            <p class="mt-3 text-sm text-gray-700">
+              <span class="font-semibold text-gray-900">Деликатная доставка</span> — по Москве и Московской области.
+            </p>
+          </article>
+
+          <article class="rounded-2xl border border-[var(--brand-accent-border)] bg-white/90 p-5 shadow-[0_16px_32px_rgba(15,10,5,0.08)] transition hover:-translate-y-1 hover:shadow-[0_22px_40px_rgba(15,10,5,0.16)]">
+            <div class="flex items-center gap-3">
+              <div class="grid h-10 w-10 place-items-center rounded-full bg-[var(--brand-accent-soft)] text-[var(--brand-accent)]" aria-hidden="true">
+                <svg viewBox="0 0 24 24" class="h-5 w-5">
+                  <path d="M7 6h10M7 12h10M7 18h7" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+                  <path d="M4 6h0M4 12h0M4 18h0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                </svg>
+              </div>
+              <p class="text-xs font-semibold uppercase tracking-[0.28em] text-gray-500">Каталог</p>
+            </div>
+            <p class="mt-3 text-sm text-gray-700">
+              <span class="font-semibold text-gray-900">Понятный каталог</span> — актуальные цены 2026, фото и подробные характеристики.
+            </p>
+          </article>
+        </div>
+      </div>
+  </section>
+
+  <div class="mx-auto mt-12 max-w-6xl">
+      <div class="h-px bg-[var(--brand-accent-border)]"></div>
+  </div>
+
+  <section class="mx-auto mt-16 max-w-6xl">
+      <div class="flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <p class="text-xs font-semibold uppercase tracking-[0.3em] text-[var(--brand-accent)]">Блог</p>
+          <h2 class="mt-2 text-2xl font-semibold">Свежие статьи</h2>
+          <p class="mt-2 text-sm text-gray-600">
+            Полезные материалы о зарыблении, уходе за прудом и выборе рыбы.
+          </p>
+        </div>
+        <a
+          class="rounded-full border border-[var(--brand-accent-border)] px-4 py-2 text-sm font-semibold text-[var(--brand-accent-dark)] transition hover:border-[var(--brand-accent)] hover:bg-[var(--brand-accent-soft)]"
+          href="/blog/"
+        >
+          Перейти в блог
+        </a>
+      </div>
+
+      <div class="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {latestPosts.map((post) => (
+          <ArticleCard post={post} href={`/blog/${post.slug}/`} />
+        ))}
+      </div>
+  </section>
+
+  <style>
+    .catalog-strip {
+      scroll-behavior: smooth;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+
+    .catalog-strip::-webkit-scrollbar {
+      width: 0;
+      height: 0;
+    }
+  </style>
 </BaseLayout>

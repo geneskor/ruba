@@ -1,1 +1,81 @@
 @import "tailwindcss";
+
+:root {
+  --brand-accent: #4fbcc6;
+  --brand-accent-dark: #2d9ea8;
+  --brand-accent-soft: #d4f2f5;
+  --brand-accent-soft-2: #bfeaed;
+  --brand-accent-border: rgba(79, 188, 198, 0.45);
+  --brand-ink: #1c1209;
+  --font-display: "Montserrat", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  --font-body: "PT Serif", "Georgia", "Times New Roman", serif;
+}
+
+.logo-tagline {
+  font-family: "Marck Script", "Segoe Script", "Bradley Hand", cursive;
+}
+
+.logo-excl {
+  display: inline-block;
+  margin-left: 0.08em;
+}
+
+html {
+  scroll-padding-top: 120px;
+}
+
+body {
+  font-family: var(--font-body);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-display);
+}
+
+.breadcrumbs {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+.breadcrumbs > * + *::before {
+  content: "—";
+  margin: 0 0.45rem;
+  color: #94a3b8;
+}
+
+.breadcrumbs a {
+  color: var(--brand-accent);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.breadcrumbs span[aria-current="page"] {
+  color: #6b7280;
+  font-weight: 600;
+}
+
+@media (max-width: 640px) {
+  .breadcrumbs {
+    gap: 0.25rem;
+    font-size: 0.75rem;
+  }
+
+  .breadcrumbs > * + *::before {
+    margin: 0 0.3rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  html {
+    scroll-padding-top: 180px;
+  }
+}

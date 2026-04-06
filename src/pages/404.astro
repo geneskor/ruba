@@ -1,0 +1,40 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="Страница не найдена" description="Ошибка 404 — страница не найдена.">
+  <meta slot="head" name="robots" content="noindex, follow" />
+  <section class="mx-auto max-w-4xl">
+    <div class="relative overflow-hidden rounded-3xl border border-[var(--brand-accent-border)] bg-white/95 p-8 shadow-[0_18px_40px_rgba(15,10,5,0.1)] sm:p-12">
+      <div class="pointer-events-none absolute -right-12 -top-16 h-40 w-40 rounded-full bg-[var(--brand-accent)]/20 blur-3xl"></div>
+      <div class="pointer-events-none absolute -left-10 bottom-0 h-20 w-20 rounded-full bg-[var(--brand-accent-soft-2)]/60 blur-2xl"></div>
+      <div class="relative">
+        <p class="text-xs font-semibold uppercase tracking-[0.3em] text-[var(--brand-accent)]">Ошибка 404</p>
+        <h1 class="mt-3 text-3xl font-semibold text-gray-900 sm:text-4xl">Страница не найдена</h1>
+        <p class="mt-4 text-base text-gray-600 sm:text-lg">
+          Похоже, ссылка неверная или страница была удалена. Попробуйте перейти на главную или в каталог.
+        </p>
+        <div class="mt-8 flex flex-wrap gap-3">
+          <a
+            class="inline-flex items-center justify-center rounded-full bg-[var(--brand-accent)] px-5 py-2.5 text-sm font-semibold text-white shadow-[0_10px_24px_rgba(0,0,0,0.2)] transition hover:bg-[var(--brand-accent-dark)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--brand-accent)]"
+            href="/"
+          >
+            На главную
+          </a>
+          <a
+            class="inline-flex items-center justify-center rounded-full border border-[var(--brand-accent-border)] px-5 py-2.5 text-sm font-semibold text-[var(--brand-accent-dark)] transition hover:bg-[var(--brand-accent-soft)]"
+            href="/ryba/"
+          >
+            В каталог
+          </a>
+          <a
+            class="inline-flex items-center justify-center rounded-full border border-[var(--brand-accent-border)] px-5 py-2.5 text-sm font-semibold text-[var(--brand-accent-dark)] transition hover:bg-[var(--brand-accent-soft)]"
+            href="/contacts/"
+          >
+            Контакты
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>

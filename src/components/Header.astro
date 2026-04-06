@@ -1,0 +1,98 @@
+---
+import OptimizedImage from './OptimizedImage.astro';
+
+const pathnameRaw = Astro.url?.pathname ?? '/';
+const normalize = (path) => (path.length > 1 && path.endsWith('/') ? path.slice(0, -1) : path);
+const pathname = normalize(pathnameRaw);
+
+const navItems = [
+  { label: 'Каталог', href: '/ryba/' },
+  { label: 'Контакты', href: '/contacts/' },
+  { label: 'Блог', href: '/blog/' }
+];
+
+const isActive = (href) => {
+  if (href === '/ryba/') {
+    return pathname.startsWith('/ryba') || pathname.startsWith('/catalog/ryba');
+  }
+  return pathname === normalize(href);
+};
+
+const linkClass = (href) =>
+  `rounded-full border border-white/35 px-4 py-2 text-[0.68rem] font-semibold uppercase tracking-[0.26em] transition ${
+    isActive(href)
+      ? 'bg-white text-[#0b1f2a] shadow-sm'
+      : 'text-white/90 hover:border-white/60 hover:bg-white/15 hover:text-white'
+  }`;
+
+const linkClassMobile = (href) =>
+  `block rounded-lg px-3 py-2 text-sm font-semibold transition ${
+    isActive(href)
+      ? 'bg-[var(--brand-accent-soft)] text-[#0b1f2a]'
+      : 'text-gray-700 hover:bg-[var(--brand-accent-soft)] hover:text-[#0b1f2a]'
+  }`;
+---
+
+<header class="fixed left-0 top-0 z-50 w-full bg-[#4ebcc6] shadow-md">
+  <div class="mx-auto flex max-w-6xl items-center justify-between px-6 py-3">
+    <a class="flex flex-col items-center ml-0 sm:-ml-8" href="/">
+      <OptimizedImage
+        src="/images/ava.png"
+        alt="Rybavprud"
+        width="192"
+        height="128"
+        class="h-20 w-32 object-cover"
+        decoding="async"
+      />
+      <span class="logo-tagline -mt-1 max-w-[10.5rem] text-center text-[1.1rem] leading-tight text-[#0b1f2a] drop-shadow-sm sm:max-w-none sm:text-[1.4rem]">
+        Рыба здесь - есть<span class="logo-excl">!</span>
+      </span>
+    </a>
+
+    <nav class="hidden items-center gap-3 text-sm md:flex">
+      {navItems.map((item) => (
+        <a
+          href={item.href}
+          aria-current={isActive(item.href) ? 'page' : undefined}
+          class={linkClass(item.href)}
+        >
+          {item.label}
+        </a>
+      ))}
+    </nav>
+
+    <details class="relative md:hidden">
+      <summary class="cursor-pointer list-none rounded-full border border-white/40 px-4 py-2 text-xs font-semibold uppercase tracking-[0.26em] text-white">
+        <span class="sr-only">Открыть меню</span>
+        <svg
+          class="h-5 w-5"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <line x1="3" y1="6" x2="21" y2="6" />
+          <line x1="3" y1="12" x2="21" y2="12" />
+          <line x1="3" y1="18" x2="21" y2="18" />
+        </svg>
+      </summary>
+
+      <div class="absolute right-0 mt-3 w-64 rounded-2xl border border-[var(--brand-accent-border)] bg-white/95 p-3 shadow-[0_16px_32px_rgba(15,10,5,0.12)] backdrop-blur">
+        <nav class="grid gap-2 text-sm">
+          {navItems.map((item) => (
+            <a
+              href={item.href}
+              aria-current={isActive(item.href) ? 'page' : undefined}
+              class={linkClassMobile(item.href)}
+            >
+              {item.label}
+            </a>
+          ))}
+        </nav>
+      </div>
+    </details>
+  </div>
+</header>

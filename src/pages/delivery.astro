@@ -1,0 +1,22 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import CanonicalLink from '../components/CanonicalLink.astro';
+import DeliveryConditions from '../components/DeliveryConditions.astro';
+import FaqList from '../components/FaqList.astro';
+import delivery from '../data/delivery.json';
+---
+
+<BaseLayout title="Доставка" description="Доставка рыбы и кормов по Москве и Московской области.">
+  <CanonicalLink slot="head" />
+
+  <div class="max-w-3xl">
+    <h1 class="text-3xl font-bold">Доставка</h1>
+    <p class="mt-3 text-base opacity-80">
+      Организуем доставку по Москве и Московской области с соблюдением температурных условий.
+    </p>
+  </div>
+
+  <DeliveryConditions items={delivery.items} />
+
+  <FaqList title="FAQ по доставке" items={delivery.faq} />
+</BaseLayout>

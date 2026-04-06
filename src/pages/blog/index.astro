@@ -1,0 +1,111 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import CanonicalLink from '../../components/CanonicalLink.astro';
+import ArticleCard from '../../components/ArticleCard.astro';
+import blog from '../../data/blog.json';
+
+const posts = [...blog.posts].sort(
+  (a, b) => new Date(b.date ?? 0).getTime() - new Date(a.date ?? 0).getTime()
+);
+---
+
+<BaseLayout title="Блог" description="Статьи о зарыблении прудов, кормах и обслуживании водоёмов." hero>
+  <CanonicalLink slot="head" />
+
+  <section
+    slot="hero"
+    class="relative overflow-hidden bg-[linear-gradient(135deg,_#0b1f2a_0%,_#123247_55%,_#07131b_100%)] text-white"
+  >
+    <div class="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(255,255,255,0.16),_transparent_55%)]"></div>
+    <div class="pointer-events-none absolute -right-16 -top-24 h-64 w-64 rounded-full bg-[color:rgba(79,188,198,0.28)] blur-3xl"></div>
+    <div class="pointer-events-none absolute -left-10 bottom-0 h-24 w-24 rounded-full bg-[color:rgba(191,234,237,0.4)] blur-2xl"></div>
+    <div class="relative mx-auto max-w-6xl px-6 pt-32 pb-16 sm:pt-36 sm:pb-20 lg:pt-40">
+      <p class="inline-flex items-center gap-2 rounded-full border border-white/30 px-3 py-1 text-xs uppercase tracking-[0.3em] text-white/70">
+        Блог
+      </p>
+      <h1 class="mt-4 text-4xl font-semibold leading-tight sm:text-5xl">
+        Полезные статьи о зарыблении, уходе и выборе рыбы
+      </h1>
+      <p class="mt-4 text-base text-white/80 sm:text-lg">
+        Разбираем практические сценарии: какой состав выбрать, как подготовить водоем и
+        что делать после запуска рыбы.
+      </p>
+    </div>
+  </section>
+
+  <section class="mx-auto mt-12 max-w-6xl">
+    <div class="flex flex-wrap items-end justify-between gap-4">
+      <div>
+        <p class="text-xs font-semibold uppercase tracking-[0.3em] text-[var(--brand-accent)]">
+          Подборка
+        </p>
+        <h2 class="mt-2 text-2xl font-semibold">Свежие статьи</h2>
+        <p class="mt-2 text-sm text-gray-600">
+          Собрали ключевые материалы, которые помогут разобраться с зарыблением.
+        </p>
+      </div>
+      <a
+        class="rounded-full border border-[var(--brand-accent-border)] px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-[var(--brand-accent-dark)] transition hover:border-[var(--brand-accent)] hover:bg-[var(--brand-accent-soft)]"
+        href="/ryba/"
+      >
+        Перейти в каталог
+      </a>
+    </div>
+
+    <div class="mt-6 rounded-3xl border border-[var(--brand-accent-border)] bg-white/95 p-6 shadow-[0_18px_40px_rgba(15,10,5,0.08)]">
+      <div class="article-grid grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {posts.map((post) => (
+          <ArticleCard post={post} href={`/blog/${post.slug}/`} />
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <script>
+    const grid = document.querySelector('.article-grid');
+    if (grid) {
+      let resizeTimer;
+
+      const updateHeights = () => {
+        grid.style.removeProperty('--article-title-height');
+        grid.style.removeProperty('--article-excerpt-height');
+
+        const titles = grid.querySelectorAll('.article-card__title');
+        const excerpts = grid.querySelectorAll('.article-card__excerpt');
+        let maxTitle = 0;
+        let maxExcerpt = 0;
+
+        titles.forEach((title) => {
+          maxTitle = Math.max(maxTitle, title.offsetHeight);
+        });
+
+        excerpts.forEach((excerpt) => {
+          maxExcerpt = Math.max(maxExcerpt, excerpt.offsetHeight);
+        });
+
+        if (maxTitle) {
+          grid.style.setProperty('--article-title-height', `${maxTitle}px`);
+        }
+
+        if (maxExcerpt) {
+          grid.style.setProperty('--article-excerpt-height', `${maxExcerpt}px`);
+        }
+      };
+
+      const scheduleUpdate = () => {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(() => {
+          requestAnimationFrame(updateHeights);
+        }, 120);
+      };
+
+      if (document.fonts?.ready) {
+        document.fonts.ready.then(scheduleUpdate);
+      }
+
+      window.addEventListener('load', scheduleUpdate);
+      window.addEventListener('resize', scheduleUpdate);
+      scheduleUpdate();
+    }
+  </script>
+</BaseLayout>

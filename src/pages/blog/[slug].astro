@@ -1,0 +1,355 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import CanonicalLink from '../../components/CanonicalLink.astro';
+import LeadForm from '../../components/LeadForm.astro';
+import FaqList from '../../components/FaqList.astro';
+import ArticleCard from '../../components/ArticleCard.astro';
+import OptimizedImage from '../../components/OptimizedImage.astro';
+import blog from '../../data/blog.json';
+import ryba from '../../data/catalog/ryba.json';
+
+export async function getStaticPaths() {
+  return blog.posts.map((post) => ({
+    params: { slug: post.slug },
+    props: { post }
+  }));
+}
+
+const { post } = Astro.props;
+const seoTitle = post.metaTitle ?? `${post.title} — блог`;
+const seoDescription = post.metaDescription ?? post.description ?? post.excerpt ?? '';
+const imageSrc = post.image ?? '/images/placeholder-article.svg';
+const imageAlt = post.imageAlt ?? post.title;
+const productLinks = ryba.products.map((product) => ({
+  name: product.name,
+  href: `/ryba/${product.category}/${product.slug}/`
+}));
+const linkClass =
+  'font-semibold text-[var(--brand-accent-dark)] underline-offset-4 transition hover:text-[var(--brand-accent)] hover:underline';
+
+const escapeRegExp = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+const buildWordPattern = (word) => {
+  const clean = word.toLowerCase();
+  const length = clean.length;
+  const stem = length <= 4 ? clean : length <= 6 ? clean.slice(0, -1) : clean.slice(0, -2);
+  const suffixMax = length <= 4 ? 2 : length <= 6 ? 3 : 4;
+  return `${escapeRegExp(stem)}[\\p{L}]{0,${suffixMax}}`;
+};
+const buildNameRegex = (name) => {
+  const parts = name
+    .split(/\s+/)
+    .map((word) => word.trim())
+    .filter(Boolean)
+    .map(buildWordPattern);
+  const separator = '(?:\\s+|\\s*[-–—]\\s*)';
+  const pattern = `(?<![\\p{L}])${parts.join(separator)}(?![\\p{L}])`;
+  return new RegExp(pattern, 'giu');
+};
+const fishMatchers = productLinks.map((product) => ({
+  ...product,
+  regex: buildNameRegex(product.name)
+}));
+
+const findNextMatch = (text, startIndex) => {
+  let best = null;
+  for (const matcher of fishMatchers) {
+    matcher.regex.lastIndex = startIndex;
+    const match = matcher.regex.exec(text);
+    if (!match) continue;
+    if (
+      !best ||
+      match.index < best.index ||
+      (match.index === best.index && match[0].length > best.match.length)
+    ) {
+      best = {
+        index: match.index,
+        match: match[0],
+        href: matcher.href
+      };
+    }
+  }
+  return best;
+};
+
+const escapeHtml = (value) =>
+  value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/\"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+
+const linkifyTextToHtml = (text) => {
+  if (!text) return '';
+  const parts = [];
+  let cursor = 0;
+
+  while (cursor < text.length) {
+    const next = findNextMatch(text, cursor);
+    if (!next) {
+      parts.push(escapeHtml(text.slice(cursor)));
+      break;
+    }
+
+    if (next.index > cursor) {
+      parts.push(escapeHtml(text.slice(cursor, next.index)));
+    }
+
+    parts.push(
+      `<a class="${linkClass}" href="${next.href}">${escapeHtml(next.match)}</a>`
+    );
+    cursor = next.index + next.match.length;
+  }
+
+  return parts.join('');
+};
+const faqItems = [];
+const contentBlocks = [];
+let inFaq = false;
+let currentQuestion = null;
+let currentAnswerParts = [];
+
+const normalizeHeading = (value) => value?.trim().toLowerCase();
+const flushFaqItem = () => {
+  if (!currentQuestion) return;
+  const answer = currentAnswerParts.join(' ').replace(/\s+/g, ' ').trim();
+  faqItems.push({ question: currentQuestion, answer });
+  currentQuestion = null;
+  currentAnswerParts = [];
+};
+
+post.content.forEach((block) => {
+  if (
+    block &&
+    typeof block === 'object' &&
+    block.type === 'h2' &&
+    normalizeHeading(block.text) === 'faq'
+  ) {
+    flushFaqItem();
+    inFaq = true;
+    return;
+  }
+
+  if (inFaq) {
+    if (block && typeof block === 'object' && block.type === 'h2') {
+      flushFaqItem();
+      inFaq = false;
+      contentBlocks.push(block);
+      return;
+    }
+
+    if (block && typeof block === 'object' && block.type === 'h3') {
+      flushFaqItem();
+      currentQuestion = block.text ?? '';
+      return;
+    }
+
+    if (typeof block === 'string') {
+      if (currentQuestion) currentAnswerParts.push(block);
+      return;
+    }
+
+    if (block && typeof block === 'object' && typeof block.text === 'string') {
+      if (currentQuestion) currentAnswerParts.push(block.text);
+      return;
+    }
+
+    return;
+  }
+
+  contentBlocks.push(block);
+});
+
+if (inFaq) {
+  flushFaqItem();
+}
+
+const faqItemsLinked = faqItems.map((item) => ({
+  question: linkifyTextToHtml(item.question),
+  answer: linkifyTextToHtml(item.answer)
+}));
+
+const relatedPosts = blog.posts
+  .filter((item) => item.slug !== post.slug)
+  .sort((a, b) => new Date(b.date ?? 0).getTime() - new Date(a.date ?? 0).getTime())
+  .slice(0, 3);
+---
+
+<BaseLayout title={seoTitle} description={seoDescription}>
+  <CanonicalLink slot="head" />
+
+  <div class="mx-auto max-w-4xl">
+    <nav class="breadcrumbs">
+      <a href="/">Главная</a>
+      <a href="/blog/">Блог</a>
+      <span aria-current="page">{post.title}</span>
+    </nav>
+  </div>
+
+  <section class="mx-auto mt-6 max-w-4xl">
+    <div class="relative overflow-hidden rounded-3xl border border-[var(--brand-accent-border)] bg-white/95 p-6 shadow-[0_24px_60px_rgba(15,10,5,0.12)] sm:p-10">
+      <div class="pointer-events-none absolute -right-16 -top-20 h-52 w-52 rounded-full bg-[var(--brand-accent)]/20 blur-3xl"></div>
+      <div class="pointer-events-none absolute -left-10 bottom-0 h-24 w-24 rounded-full bg-[var(--brand-accent-soft-2)]/60 blur-2xl"></div>
+      <div class="relative">
+        <p class="text-xs font-semibold uppercase tracking-[0.3em] text-[var(--brand-accent)]">Блог</p>
+        <h1 class="mt-3 text-3xl font-semibold text-gray-900 sm:text-4xl">{post.title}</h1>
+        {post.excerpt ? <p class="mt-4 text-base text-gray-600 sm:text-lg">{post.excerpt}</p> : null}
+        {post.date ? (
+          <div class="mt-5 flex flex-wrap items-center gap-3 text-xs text-gray-500">
+            <span class="rounded-full bg-[var(--brand-accent-soft)] px-3 py-1 font-semibold text-[var(--brand-accent-dark)]">
+              {post.date}
+            </span>
+            <span class="uppercase tracking-[0.28em]">Статья</span>
+          </div>
+        ) : null}
+      </div>
+    </div>
+  </section>
+
+  <section class="mx-auto mt-8 max-w-4xl">
+    <article class="rounded-3xl border border-[var(--brand-accent-border)] bg-white/95 p-6 shadow-[0_18px_40px_rgba(15,10,5,0.1)] sm:p-10">
+      <OptimizedImage
+        class="aspect-[3/2] w-full rounded-2xl object-cover shadow-[0_12px_30px_rgba(15,10,5,0.12)]"
+        src={imageSrc}
+        alt={imageAlt}
+        decoding="async"
+        fetchpriority="high"
+      />
+
+      <div class="mt-8">
+        {contentBlocks.map((block, index) => {
+          const prevBlock = contentBlocks[index - 1];
+          const isLead = index === 0 && typeof block === 'string';
+          const isPracticalList =
+            prevBlock &&
+            typeof prevBlock === 'object' &&
+            prevBlock.type === 'h2' &&
+            prevBlock.text === 'Практический блок';
+
+          if (typeof block === 'string') {
+            return (
+              <p
+                class={`text-gray-700 ${isLead ? 'text-lg leading-8' : 'text-base leading-7'} ${index === 0 ? '' : 'mt-4'}`}
+                set:html={linkifyTextToHtml(block)}
+              ></p>
+            );
+          }
+
+          if (block.type === 'h2') {
+            return (
+              <h2
+                class={`relative text-2xl font-semibold text-gray-900 ${index === 0 ? '' : 'mt-10'} pl-4 before:absolute before:left-0 before:top-2 before:h-5 before:w-1 before:rounded-full before:bg-[var(--brand-accent)] before:content-['']`}
+                set:html={linkifyTextToHtml(block.text)}
+              ></h2>
+            );
+          }
+
+          if (block.type === 'h3') {
+            return (
+              <h3
+                class={`text-xl font-semibold text-gray-900 ${index === 0 ? '' : 'mt-6'}`}
+                set:html={linkifyTextToHtml(block.text)}
+              ></h3>
+            );
+          }
+
+          if (block.type === 'ul') {
+            return (
+              <ul
+                class={`list-disc space-y-2 pl-5 text-base leading-7 text-gray-700 marker:text-[var(--brand-accent-dark)] ${index === 0 ? '' : 'mt-4'} ${
+                  isPracticalList ? 'rounded-2xl border border-[var(--brand-accent-border)] bg-[var(--brand-accent-soft)]/40 p-5' : ''
+                }`}
+              >
+                {block.items.map((item) => (
+                  <li set:html={linkifyTextToHtml(item)}></li>
+                ))}
+              </ul>
+            );
+          }
+
+          if (block.type === 'ol') {
+            const listBase = `list-decimal space-y-2 text-base leading-7 text-gray-700 marker:text-[var(--brand-accent-dark)] ${
+              index === 0 ? '' : 'mt-4'
+            }`;
+            const listPadding = isPracticalList ? 'list-outside pl-8' : 'pl-5';
+            return (
+              <ol
+                class={`${listBase} ${listPadding} ${
+                  isPracticalList ? 'rounded-2xl border border-[var(--brand-accent-border)] bg-[var(--brand-accent-soft)]/40 p-5' : ''
+                }`}
+              >
+                {block.items.map((item) => (
+                  <li set:html={linkifyTextToHtml(item)}></li>
+                ))}
+              </ol>
+            );
+          }
+
+          return (
+            <p
+              class={`text-base leading-7 text-gray-700 ${index === 0 ? '' : 'mt-4'}`}
+              set:html={linkifyTextToHtml(block.text)}
+            ></p>
+          );
+        })}
+      </div>
+    </article>
+  </section>
+
+  {faqItems.length ? (
+    <section class="mx-auto mt-8 max-w-4xl">
+      <div class="rounded-2xl border border-[var(--brand-accent-border)] bg-white/95 p-6 shadow-[0_16px_32px_rgba(15,10,5,0.08)]">
+        <FaqList title="FAQ" items={faqItemsLinked} className="mt-0" />
+      </div>
+    </section>
+  ) : null}
+
+  {post.relatedLinks?.length ? (
+    <section class="mx-auto mt-8 max-w-4xl">
+      <div class="rounded-2xl border border-[var(--brand-accent-border)] bg-white/95 p-6 shadow-[0_16px_32px_rgba(15,10,5,0.08)]">
+        <h2 class="text-xl font-semibold text-gray-900">Полезные ссылки</h2>
+        <ul class="mt-4 grid gap-3 text-sm text-gray-700">
+          {post.relatedLinks.map((link) => (
+            <li>
+              <a class="font-semibold text-[var(--brand-accent-dark)] underline-offset-4 transition hover:text-[var(--brand-accent)] hover:underline" href={link.href}>
+                {link.title}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+  ) : null}
+
+  {relatedPosts.length ? (
+    <section class="mx-auto mt-8 max-w-4xl">
+      <div class="rounded-2xl border border-[var(--brand-accent-border)] bg-white/95 p-6 shadow-[0_16px_32px_rgba(15,10,5,0.08)]">
+        <div class="flex flex-wrap items-end justify-between gap-4">
+          <div>
+            <p class="text-xs font-semibold uppercase tracking-[0.3em] text-[var(--brand-accent)]">Читайте также</p>
+            <h2 class="mt-2 text-2xl font-semibold">Полезные статьи</h2>
+          </div>
+          <a
+            class="rounded-full border border-[var(--brand-accent-border)] px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-[var(--brand-accent-dark)] transition hover:border-[var(--brand-accent)] hover:bg-[var(--brand-accent-soft)]"
+            href="/blog/"
+          >
+            Все статьи
+          </a>
+        </div>
+        <div class="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {relatedPosts.map((item) => (
+            <ArticleCard post={item} href={`/blog/${item.slug}/`} />
+          ))}
+        </div>
+      </div>
+    </section>
+  ) : null}
+
+  <div class="mx-auto mt-8 max-w-4xl">
+    <LeadForm
+      title={post.cta?.title ?? 'Нужна консультация?'}
+      description={post.cta?.description ?? 'Оставьте заявку, и мы свяжемся с вами.'}
+      submitLabel="Оставить заявку"
+    />
+  </div>
+</BaseLayout>

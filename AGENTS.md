@@ -2,10 +2,10 @@
 
 ## Структура проекта и организация модулей
 Это сайт на Astro + Tailwind.
-- `src/pages/` — страницы маршрутов (`index.astro`, `catalog.astro`, `about.astro`, `contacts.astro`, `ryba/index.astro`, `ryba/[category]/index.astro`, `ryba/[category]/[slug].astro`); имя файла соответствует URL.
+- `src/pages/` — страницы маршрутов (`index.astro`, `about.astro`, `contacts.astro`, `delivery.astro`, `blog/index.astro`, `blog/[slug].astro`, `catalog/ryba/index.astro`, `catalog/ryba/[category]/index.astro`, `catalog/ryba/[category]/[slug].astro`, `ryba/index.astro`, `ryba/[category]/index.astro`, `ryba/[category]/[slug].astro`, `sitemap.xml.ts`); имя файла соответствует URL.
 - `src/components/` — переиспользуемые UI-компоненты.
 - `src/layouts/` — общие каркасы страниц (`Layout.astro`, `BaseLayout.astro`).
-- `src/data/` — локальные данные (например, `products.json`, `categories.json`, `fish.json`).
+- `src/data/` — локальные данные (например, `products.json`, `categories.json`, `fish.json`, `catalog/ryba.json`, `blog.json`, `delivery.json`, `product-faq.json`).
 - `src/styles/` — глобальные стили (`global.css` подключает Tailwind).
 - `src/assets/` — ассеты, которые бандлятся; `public/` — статика как есть (например, `public/favicon.svg`).
 - Конфиги: `astro.config.mjs`, `tsconfig.json`; сборка попадает в `dist/`.

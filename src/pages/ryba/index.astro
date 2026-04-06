@@ -1,50 +1,137 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import categories from '../../data/categories.json';
-import fish from '../../data/fish.json';
+import CanonicalLink from '../../components/CanonicalLink.astro';
+import CategoryCard from '../../components/CategoryCard.astro';
+import ProductCard from '../../components/ProductCard.astro';
+import ryba from '../../data/catalog/ryba.json';
 
-const categoryMap = Object.fromEntries(
-  categories.map((category) => [category.slug, category.title])
-);
+const categoriesWithItems = ryba.categories.map((category) => ({
+  category,
+  items: ryba.products.filter((item) => item.category === category.slug)
+}));
+const categoryCount = ryba.categories.length;
+const productCount = ryba.products.length;
 ---
 
-<BaseLayout title="Каталог рыбы">
-  <div class="max-w-5xl">
-    <h1 class="text-3xl font-bold">Каталог рыбы</h1>
-    <p class="mt-3 text-base opacity-80">
-      Подборка рыбы для зарыбления, товарных водоёмов и декоративных проектов.
-    </p>
+<BaseLayout title="Каталог: Рыба для пруда" description={ryba.description} hero>
+  <CanonicalLink slot="head" />
+
+  <div class="-mx-6">
+    <section class="relative overflow-hidden bg-[linear-gradient(135deg,_#0b1f2a_0%,_#123247_55%,_#07131b_100%)] text-white">
+      <div class="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(255,255,255,0.16),_transparent_55%)]"></div>
+      <div class="pointer-events-none absolute -right-20 -top-24 h-72 w-72 rounded-full bg-[color:rgba(79,188,198,0.28)] blur-3xl"></div>
+      <div class="relative mx-auto max-w-6xl px-6 pt-32 pb-16 sm:pt-36 sm:pb-20 lg:pt-40">
+        <div class="flex flex-col gap-10 lg:flex-row lg:items-end lg:justify-between">
+          <div class="max-w-2xl">
+            <p class="inline-flex items-center gap-2 rounded-full border border-white/30 px-3 py-1 text-xs uppercase tracking-[0.3em] text-white/70">
+              Каталог
+            </p>
+            <h1 class="mt-4 text-4xl font-semibold leading-tight sm:text-5xl">
+              Рыба для пруда
+            </h1>
+            <p class="mt-4 text-base text-white/80 sm:text-lg">{ryba.description}</p>
+          </div>
+          <div class="grid gap-4 sm:grid-cols-2">
+            <div class="rounded-2xl border border-white/20 bg-white/10 px-5 py-4 backdrop-blur">
+              <p class="text-xs uppercase tracking-[0.35em] text-white/60">Категории</p>
+              <p class="mt-2 text-3xl font-semibold text-white">{categoryCount}</p>
+              <p class="mt-1 text-sm text-white/70">под разные задачи</p>
+            </div>
+            <div class="rounded-2xl border border-white/20 bg-white/10 px-5 py-4 backdrop-blur">
+              <p class="text-xs uppercase tracking-[0.35em] text-white/60">Позиции</p>
+              <p class="mt-2 text-3xl font-semibold text-white">{productCount}</p>
+              <p class="mt-1 text-sm text-white/70">в актуальном наличии</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
   </div>
 
-  <section class="mt-8">
-    <h2 class="text-2xl font-semibold">Категории</h2>
-    <div class="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-      {categories.map((category) => (
-        <a
-          href={`/ryba/${category.slug}/`}
-          class="block rounded-xl border p-4 hover:shadow-sm"
-        >
-          <h3 class="text-lg font-semibold">{category.title}</h3>
-          <p class="mt-2 text-sm opacity-70">Смотреть виды</p>
-        </a>
-      ))}
+  <section id="categories" class="mx-auto mt-12 max-w-6xl scroll-mt-44 pb-6">
+    <div class="grid gap-10 lg:grid-cols-[280px_minmax(0,1fr)] lg:items-start">
+      <aside class="categories-scroll hidden lg:block lg:sticky lg:top-44 lg:max-h-[calc(100vh-220px)] lg:overflow-auto lg:overscroll-contain lg:pr-2">
+        <div class="categories-head sticky top-0 z-20 bg-sky-50 pb-4 pt-2">
+          <div class="flex flex-wrap items-end justify-between gap-4">
+            <h2 class="text-2xl font-semibold">Категории</h2>
+            <p class="text-sm text-gray-600">Быстрый переход по разделам.</p>
+          </div>
+        </div>
+        <div class="space-y-5">
+          {categoriesWithItems.map(({ category, items }) => (
+            <CategoryCard category={category} href={`/ryba/${category.slug}/`} items={items} compact />
+          ))}
+        </div>
+      </aside>
+
+      <div id="all" class="scroll-mt-44">
+        <div class="flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <h2 class="text-2xl font-semibold">Виды по категориям</h2>
+            <p class="mt-2 text-sm text-gray-600">Сравните варианты и перейдите в нужную подборку.</p>
+          </div>
+          <nav
+            class="flex flex-wrap gap-2 text-[11px] font-semibold uppercase tracking-[0.22em]"
+            aria-label="Быстрый переход по категориям"
+          >
+            {categoriesWithItems.map(({ category }) => (
+              <a
+                class="rounded-full border border-[var(--brand-accent-border)] px-3 py-1 text-[var(--brand-accent-dark)] transition hover:border-[var(--brand-accent)] hover:bg-[var(--brand-accent-soft)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--brand-accent)]"
+                href={`#${category.slug}`}
+              >
+                {category.title}
+              </a>
+            ))}
+          </nav>
+        </div>
+
+        <div class="mt-8 space-y-10">
+          {categoriesWithItems.map(({ category, items }) => (
+            <div
+              id={category.slug}
+              class="scroll-mt-32 rounded-3xl border border-[var(--brand-accent-border)] bg-white/90 p-6 shadow-[0_16px_32px_rgba(15,10,5,0.08)]"
+            >
+              <div class="flex flex-wrap items-start justify-between gap-3">
+                <div>
+                  <h3 class="text-xl font-semibold text-gray-900">{category.title}</h3>
+                  {category.description ? (
+                    <p class="mt-2 text-sm text-gray-600">{category.description}</p>
+                  ) : null}
+                </div>
+                <a
+                  class="inline-flex items-center gap-2 rounded-full border border-[var(--brand-accent-border)] px-4 py-2 text-sm font-semibold text-[var(--brand-accent-dark)] transition hover:border-[var(--brand-accent)] hover:bg-[var(--brand-accent-soft)]"
+                  href={`/ryba/${category.slug}/`}
+                >
+                  В категорию
+                  <span aria-hidden="true">→</span>
+                </a>
+              </div>
+
+              {items.length ? (
+                <div class="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                  {items.map((item) => (
+                    <ProductCard product={item} href={`/ryba/${item.category}/${item.slug}/`} compact />
+                  ))}
+                </div>
+              ) : (
+                <p class="mt-4 text-sm text-gray-500">В этой категории пока нет позиций.</p>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
   </section>
 
-  <section class="mt-10">
-    <h2 class="text-2xl font-semibold">Все виды</h2>
-    <div class="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-      {fish.map((item) => (
-        <a
-          href={`/ryba/${item.category}/${item.slug}/`}
-          class="block rounded-xl border p-4 hover:shadow-sm"
-        >
-          <h3 class="text-lg font-semibold">{item.name}</h3>
-          <p class="mt-2 text-sm opacity-80">{item.desc}</p>
-          <p class="mt-3 text-sm opacity-70">{categoryMap[item.category]}</p>
-          <p class="mt-3 font-medium">{item.priceFrom}</p>
-        </a>
-      ))}
-    </div>
-  </section>
+  <style>
+    .categories-scroll {
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+
+    .categories-scroll::-webkit-scrollbar {
+      width: 0;
+      height: 0;
+    }
+  </style>
 </BaseLayout>

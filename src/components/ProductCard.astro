@@ -1,0 +1,110 @@
+---
+import OptimizedImage from './OptimizedImage.astro';
+
+const { product, href, compact = false } = Astro.props;
+const imageSrc = product.image ?? '/images/placeholder-fish.svg';
+const imageAlt = product.imageAlt ?? product.name;
+const rawPrice = product.priceFrom ?? '';
+const scale90Slugs = ['limonnyy-dekorativnyy-karas', 'zolotaya-rybka', 'zolotoy-yaz'];
+const scale95Slugs = ['krasnyy-dekorativnyy-karas', 'kometa'];
+const scale85Slugs = ['vualevyy-karp'];
+const mirrorSlugs = ['vualevyy-karp', 'zolotoy-yaz'];
+const noShrinkCategories = ['dekorativnye-ryby', 'prochee'];
+const forceShrinkSlugs = ['perlovitsy'];
+const isScale90 = scale90Slugs.includes(product.slug);
+const isScale95 = scale95Slugs.includes(product.slug);
+const isScale85 = scale85Slugs.includes(product.slug);
+const isMirrored = mirrorSlugs.includes(product.slug);
+const shouldShrink =
+  forceShrinkSlugs.includes(product.slug) || !noShrinkCategories.includes(product.category);
+const needsContain = isScale90 || isScale95 || isScale85;
+const shouldContain = needsContain || shouldShrink;
+const regularScaleClass = isScale85
+  ? 'scale-[0.85]'
+  : isScale90
+    ? 'scale-90'
+    : isScale95
+      ? 'scale-95'
+      : shouldShrink
+        ? 'scale-90'
+        : '';
+const baseImageWrapClass = [
+  'relative w-full overflow-hidden flex items-center justify-center',
+  compact ? 'aspect-[4/3] rounded-[18px]' : 'aspect-[5/3] rounded-[24px]',
+  'bg-white'
+].join(' ');
+const imageWrapClass = isScale90 ? `${baseImageWrapClass} p-5` : baseImageWrapClass;
+const baseImageClass = 'h-full w-full transition duration-300';
+const regularHoverScaleClass = isScale85
+  ? 'group-hover:scale-[0.9]'
+  : isScale90 || shouldShrink
+    ? 'group-hover:scale-95'
+    : isScale95
+      ? 'group-hover:scale-100'
+      : 'group-hover:scale-[1.04]';
+const mirrorScaleClass = isScale85
+  ? '-scale-x-[0.85] scale-y-[0.85]'
+  : isScale90 || shouldShrink
+    ? '-scale-x-90 scale-y-90'
+    : isScale95
+      ? '-scale-x-95 scale-y-95'
+      : '-scale-x-100';
+const mirrorHoverScaleClass = isScale85
+  ? 'group-hover:-scale-x-[0.9] group-hover:scale-y-[0.9]'
+  : isScale90 || shouldShrink
+    ? 'group-hover:-scale-x-95 group-hover:scale-y-95'
+    : isScale95
+      ? 'group-hover:-scale-x-100 group-hover:scale-y-100'
+      : 'group-hover:-scale-x-[1.04] group-hover:scale-y-[1.04]';
+const scaleClass = isMirrored ? mirrorScaleClass : regularScaleClass;
+const hoverScaleClass = isMirrored ? mirrorHoverScaleClass : regularHoverScaleClass;
+const imageClass = shouldContain
+  ? `${baseImageClass} ${hoverScaleClass} ${scaleClass} object-contain`
+  : `${baseImageClass} ${hoverScaleClass} ${scaleClass} object-cover`;
+const displayPrice =
+  typeof rawPrice === 'string'
+    ? rawPrice
+        .replace(/\u00a0/g, ' ')
+        .replace(/руб\.?\s*\/\s*(шт|кг)/gi, 'руб.')
+        .replace(/р\s*\/\s*(шт|кг)/gi, 'руб.')
+        .replace(/\s{2,}/g, ' ')
+    : rawPrice;
+const cardClass = [
+  'group flex h-full flex-col overflow-hidden border border-[var(--brand-accent-border)] bg-white',
+  'shadow-[0_12px_30px_rgba(79,188,198,0.18)] transition duration-200 hover:-translate-y-1.5 hover:shadow-[0_22px_50px_rgba(79,188,198,0.28)]',
+  compact ? 'rounded-[20px] p-3' : 'rounded-[28px] p-4'
+].join(' ');
+const bodyClass = compact ? 'mt-3 flex-1' : 'mt-4 flex-1';
+const titleClass = compact ? 'text-base font-semibold text-gray-900' : 'text-lg font-semibold text-gray-900';
+const descClass = compact ? 'mt-1.5 text-xs text-gray-500' : 'mt-2 text-sm text-gray-600';
+const pricePillClass = compact
+  ? 'absolute left-3 bottom-3 rounded-full bg-white/95 px-3 py-1 text-xs font-semibold text-[var(--brand-accent)] shadow-sm'
+  : 'absolute left-4 top-4 rounded-full bg-white/95 px-3 py-1 text-xs font-semibold text-[var(--brand-accent)] shadow-sm';
+const buttonClass = compact
+  ? 'mt-3 inline-flex items-center justify-center gap-2 rounded-full bg-[var(--brand-accent)] px-3 py-1.5 text-xs font-semibold text-white shadow-sm transition hover:bg-[var(--brand-accent-dark)]'
+  : 'mt-4 inline-flex items-center justify-center gap-2 rounded-full bg-[var(--brand-accent)] px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-[var(--brand-accent-dark)]';
+---
+
+<a href={href} class={cardClass}>
+  <div class={imageWrapClass}>
+    <OptimizedImage
+      src={imageSrc}
+      alt={imageAlt}
+      class={imageClass}
+      loading="lazy"
+      decoding="async"
+    />
+    {displayPrice ? (
+      <span class={pricePillClass}>{displayPrice}</span>
+    ) : null}
+  </div>
+  <div class={bodyClass}>
+    <h3 class={titleClass}>{product.name}</h3>
+    {product.shortDesc ? (
+      <p class={descClass}>{product.shortDesc}</p>
+    ) : null}
+  </div>
+  <span class={buttonClass}>
+    Купить
+  </span>
+</a>

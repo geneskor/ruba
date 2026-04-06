@@ -1,42 +1,56 @@
 ---
 import BaseLayout from '../../../layouts/BaseLayout.astro';
-import categories from '../../../data/categories.json';
-import fish from '../../../data/fish.json';
+import CanonicalLink from '../../../components/CanonicalLink.astro';
+import ProductCard from '../../../components/ProductCard.astro';
+import ryba from '../../../data/catalog/ryba.json';
 
 export async function getStaticPaths() {
-  return categories.map((category) => ({
+  return ryba.categories.map((category) => ({
     params: { category: category.slug },
     props: { category }
   }));
 }
 
 const { category } = Astro.props;
-const items = fish.filter((item) => item.category === category.slug);
+const items = ryba.products.filter((item) => item.category === category.slug);
+const title = `Каталог: ${category.title}`;
+const description = category.description ?? ryba.description;
+const itemCount = items.length;
 ---
 
-<BaseLayout title={`Каталог: ${category.title}`}>
-  <div class="max-w-5xl">
-    <a class="text-sm underline" href="/ryba/">Все рыбы</a>
-    <h1 class="mt-3 text-3xl font-bold">{category.title}</h1>
-    <p class="mt-3 text-base opacity-80">
-      Подборка видов из категории «{category.title}».
-    </p>
-  </div>
+<BaseLayout title={title} description={description} hero flushBottom>
+  <CanonicalLink slot="head" />
 
-  {items.length ? (
-    <div class="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-      {items.map((item) => (
-        <a
-          href={`/ryba/${item.category}/${item.slug}/`}
-          class="block rounded-xl border p-4 hover:shadow-sm"
-        >
-          <h2 class="text-xl font-semibold">{item.name}</h2>
-          <p class="mt-2 opacity-80">{item.desc}</p>
-          <p class="mt-3 font-medium">{item.priceFrom}</p>
+  <div class="-mx-6 bg-gradient-to-t from-[var(--brand-accent-soft-2)] via-[var(--brand-accent-soft)] to-white">
+    <section class="relative overflow-hidden">
+      <div class="pointer-events-none absolute -right-10 -top-12 h-40 w-40 rounded-full bg-[color:rgba(120,219,226,0.2)] blur-3xl"></div>
+      <div class="relative mx-auto max-w-6xl px-6 pt-32 pb-12 sm:pt-36 sm:pb-14 lg:pt-40">
+        <nav class="breadcrumbs" aria-label="breadcrumbs">
+          <a href="/ryba/">Рыба для пруда</a>
+          <span aria-current="page">{category.title}</span>
+        </nav>
+        <h1 class="mt-4 text-3xl font-semibold text-gray-900 sm:text-4xl">{category.title}</h1>
+        {category.description ? (
+          <p class="mt-3 text-base text-gray-600">{category.description}</p>
+        ) : null}
+        <div class="mt-5 inline-flex items-center gap-2 rounded-full border border-[var(--brand-accent-border)] bg-white/80 px-4 py-2 text-xs font-semibold uppercase tracking-[0.24em] text-[var(--brand-accent-dark)]">
+          {itemCount} позиций
+        </div>
+      </div>
+    </section>
+
+    <section class="mx-auto mt-10 max-w-6xl px-6 pb-14">
+      <div class="flex flex-wrap items-center justify-between gap-4">
+        <h2 class="text-2xl font-semibold">Виды в категории</h2>
+        <a class="text-sm font-semibold text-[var(--brand-accent-dark)] transition hover:text-[var(--brand-accent-dark)]" href="/ryba/">
+          К каталогу
         </a>
-      ))}
-    </div>
-  ) : (
-    <p class="mt-6 text-sm opacity-70">В этой категории пока нет позиций.</p>
-  )}
+      </div>
+      <div class="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        {items.map((item) => (
+          <ProductCard product={item} href={`/ryba/${item.category}/${item.slug}/`} />
+        ))}
+      </div>
+    </section>
+  </div>
 </BaseLayout>

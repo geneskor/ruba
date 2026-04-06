@@ -1,0 +1,9 @@
+---
+const { path } = Astro.props;
+const site = Astro.site;
+const rawPath = path ?? Astro.url.pathname ?? '/';
+const normalized = rawPath === '/' ? '/' : rawPath.endsWith('/') ? rawPath : `${rawPath}/`;
+const canonical = site ? new URL(normalized, site).toString() : normalized;
+---
+
+<link rel="canonical" href={canonical} />

@@ -1,0 +1,134 @@
+---
+const {
+  title = 'Оставить заявку',
+  description = 'Заполните форму, и мы свяжемся с вами в ближайшее время.',
+  submitLabel = 'Отправить'
+} = Astro.props;
+
+const formEmail = 'rybazdesest@mail.ru';
+const formAction = `https://formsubmit.co/${formEmail}`;
+const formSource = Astro.url?.pathname ?? '/';
+const thankYouPath = '/spasibo/';
+---
+
+<section class="lead-form relative overflow-hidden rounded-3xl border border-[var(--brand-accent-border)] bg-white/95 p-6 shadow-[0_18px_36px_rgba(15,10,5,0.12)]">
+
+
+  <div class="relative z-10">
+    <div class="flex flex-wrap items-start justify-between gap-4">
+      <div>
+        <p class="text-xs font-semibold uppercase tracking-[0.3em] text-[var(--brand-accent)]">Заявка</p>
+        <h2 class="mt-2 text-2xl font-semibold text-gray-900">{title}</h2>
+        {description ? <p class="mt-2 text-sm text-gray-600">{description}</p> : null}
+      </div>
+    </div>
+
+    <form class="mt-6 grid gap-4 sm:grid-cols-2" action={formAction} method="post">
+      <input type="hidden" name="_subject" value={`Заявка с сайта: ${title}`} />
+      <input type="hidden" name="_captcha" value="false" />
+      <input type="hidden" name="_next" value={thankYouPath} />
+      <input type="hidden" name="source" value={formSource} />
+      <input type="text" name="_honey" class="hidden" tabindex="-1" autocomplete="off" />
+      <label class="grid gap-2 text-sm text-gray-700">
+        <span class="text-xs font-semibold uppercase tracking-[0.24em] text-gray-500">Имя</span>
+        <input
+          class="rounded-xl border border-[var(--brand-accent-border)] bg-white px-4 py-3 text-sm text-gray-900 shadow-[0_10px_20px_rgba(15,10,5,0.04)] focus:outline-none focus:ring-2 focus:ring-[var(--brand-accent)]/40"
+          type="text"
+          name="name"
+          autocomplete="name"
+          placeholder="Иван"
+          required
+        />
+      </label>
+      <label class="grid gap-2 text-sm text-gray-700">
+        <span class="text-xs font-semibold uppercase tracking-[0.24em] text-gray-500">Телефон</span>
+        <input
+          class="rounded-xl border border-[var(--brand-accent-border)] bg-white px-4 py-3 text-sm text-gray-900 shadow-[0_10px_20px_rgba(15,10,5,0.04)] focus:outline-none focus:ring-2 focus:ring-[var(--brand-accent)]/40"
+          type="tel"
+          name="phone"
+          inputmode="tel"
+          maxlength="18"
+          pattern="^\\+7\\s\\(\\d{3}\\)\\s\\d{3}\\s\\d{2}-\\d{2}$"
+          autocomplete="tel"
+          placeholder="+7 (000) 000 00-00"
+          required
+        />
+      </label>
+      <label class="grid gap-2 text-sm text-gray-700 sm:col-span-2">
+        <span class="text-xs font-semibold uppercase tracking-[0.24em] text-gray-500">Комментарий</span>
+        <textarea
+          class="min-h-[120px] rounded-xl border border-[var(--brand-accent-border)] bg-white px-4 py-3 text-sm text-gray-900 shadow-[0_10px_20px_rgba(15,10,5,0.04)] focus:outline-none focus:ring-2 focus:ring-[var(--brand-accent)]/40"
+          name="comment"
+          placeholder="Коротко опишите задачу"
+        ></textarea>
+      </label>
+      <div class="flex flex-wrap items-center justify-between gap-4 sm:col-span-2">
+        <p class="text-xs text-gray-300">
+          Нажимая кнопку, вы соглашаетесь на обработку персональных данных.
+        </p>
+        <button
+          class="inline-flex items-center justify-center rounded-full bg-[var(--brand-accent)] px-6 py-3 text-sm font-semibold text-white shadow-[0_12px_24px_rgba(79,188,198,0.35)] transition hover:bg-[var(--brand-accent-dark)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-accent)]/40"
+          type="submit"
+        >
+          {submitLabel}
+        </button>
+      </div>
+    </form>
+  </div>
+</section>
+
+<script>
+  const phoneInputs = document.querySelectorAll('.lead-form input[name="phone"]');
+  const leadForms = document.querySelectorAll('.lead-form form');
+
+  leadForms.forEach((form) => {
+    const nextInput = form.querySelector('input[name="_next"]');
+    if (nextInput && window.location?.origin) {
+      nextInput.value = new URL(nextInput.value, window.location.origin).toString();
+    }
+  });
+
+  phoneInputs.forEach((phoneInput) => {
+    const formatPhone = (value) => {
+      let digits = value.replace(/\D/g, '');
+      if (!digits) return '';
+      if (digits.startsWith('8')) {
+        digits = '7' + digits.slice(1);
+      } else if (!digits.startsWith('7')) {
+        digits = '7' + digits;
+      }
+      digits = digits.slice(0, 11);
+      const rest = digits.slice(1);
+      let result = '+7';
+      if (rest.length > 0) result += ' (' + rest.slice(0, 3);
+      if (rest.length >= 3) result += ')';
+      if (rest.length > 3) result += ' ' + rest.slice(3, 6);
+      if (rest.length > 6) result += ' ' + rest.slice(6, 8);
+      if (rest.length > 8) result += '-' + rest.slice(8, 10);
+      return result;
+    };
+
+    const caretFromDigits = (value, digitsCount) => {
+      if (digitsCount <= 0) return 0;
+      let count = 0;
+      for (let i = 0; i < value.length; i += 1) {
+        if (/\d/.test(value[i])) count += 1;
+        if (count >= digitsCount) return i + 1;
+      }
+      return value.length;
+    };
+
+    const onInput = (event) => {
+      const target = event.target;
+      const prevValue = target.value;
+      const caret = target.selectionStart ?? prevValue.length;
+      const digitsBefore = prevValue.slice(0, caret).replace(/\D/g, '').length;
+      const formatted = formatPhone(prevValue);
+      target.value = formatted;
+      const nextCaret = caretFromDigits(formatted, digitsBefore);
+      target.setSelectionRange(nextCaret, nextCaret);
+    };
+
+    phoneInput.addEventListener('input', onInput);
+  });
+</script>

@@ -1,0 +1,29 @@
+---
+const { product, categoryTitle, url } = Astro.props;
+const site = Astro.site;
+const imageUrl = product.image && site ? new URL(product.image, site).toString() : product.image;
+const data = {
+  '@context': 'https://schema.org',
+  '@type': 'Product',
+  name: product.name,
+  description: product.description ?? product.shortDesc ?? '',
+  sku: product.id ?? product.slug,
+  category: categoryTitle,
+  image: imageUrl ? [imageUrl] : undefined,
+  brand: {
+    '@type': 'Brand',
+    name: 'Rybavprud'
+  },
+  offers: {
+    '@type': 'Offer',
+    price: String(product.price ?? ''),
+    priceCurrency: 'RUB',
+    availability: 'https://schema.org/InStock',
+    url
+  }
+};
+---
+
+<script type="application/ld+json">
+  {JSON.stringify(data)}
+</script>

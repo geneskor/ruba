@@ -1,31 +1,196 @@
 ---
 import BaseLayout from '../../../layouts/BaseLayout.astro';
-import categories from '../../../data/categories.json';
-import fish from '../../../data/fish.json';
+import CanonicalLink from '../../../components/CanonicalLink.astro';
+import ProductJsonLd from '../../../components/ProductJsonLd.astro';
+import LeadForm from '../../../components/LeadForm.astro';
+import FaqList from '../../../components/FaqList.astro';
+import RelatedProducts from '../../../components/RelatedProducts.astro';
+import OptimizedImage from '../../../components/OptimizedImage.astro';
+import ryba from '../../../data/catalog/ryba.json';
+import productFaq from '../../../data/product-faq.json';
+import productFaqBySlug from '../../../data/product-faq-by-slug.json';
 
 export async function getStaticPaths() {
-  return fish.map((item) => ({
-    params: { category: item.category, slug: item.slug },
-    props: { item }
+  return ryba.products.map((product) => ({
+    params: { category: product.category, slug: product.slug },
+    props: { product }
   }));
 }
 
-const { item } = Astro.props;
-const category = categories.find((entry) => entry.slug === item.category);
-const categoryTitle = category ? category.title : item.category;
+const { product } = Astro.props;
+const category = ryba.categories.find((entry) => entry.slug === product.category);
+const categoryTitle = category ? category.title : 'Рыба для пруда';
+const seoTitle = `${product.name} — купить с доставкой по Москве`;
+const seoDescription = `${product.name} из категории «${categoryTitle}». Доставка по Москве и области, актуальные условия и консультация.`;
+const path = Astro.url.pathname === '/' ? '/' : Astro.url.pathname.endsWith('/') ? Astro.url.pathname : `${Astro.url.pathname}/`;
+const canonicalUrl = Astro.site ? new URL(path, Astro.site).toString() : path;
+const descriptionParagraphs = (product.description ?? '')
+  .split('\n\n')
+  .map((paragraph) => paragraph.trim())
+  .filter(Boolean);
+
+const sameCategory = ryba.products.filter(
+  (item) => item.category === product.category && item.slug !== product.slug
+);
+const fallback = ryba.products.filter(
+  (item) => item.category !== product.category && item.slug !== product.slug
+);
+const relatedItems = [...sameCategory, ...fallback].slice(0, 3).map((item) => ({
+  ...item,
+  href: `/ryba/${item.category}/${item.slug}/`
+}));
+const faqItems = productFaqBySlug[product.slug] ?? productFaq;
 ---
 
-<BaseLayout title={item.name} description={item.desc}>
-  <div class="max-w-3xl">
-    <a class="text-sm underline" href={`/ryba/${item.category}/`}>
-      {categoryTitle}
-    </a>
-    <h1 class="mt-3 text-3xl font-bold">{item.name}</h1>
-    <p class="mt-3 text-base opacity-80">{item.desc}</p>
-    <p class="mt-4 text-lg font-semibold">{item.priceFrom}</p>
-    <div class="mt-6 flex flex-wrap gap-3 text-sm">
-      <a class="underline" href="/ryba/">Все рыбы</a>
-      <a class="underline" href="/contacts/">Контакты</a>
+<BaseLayout title={seoTitle} description={seoDescription} hero flushBottom>
+  <CanonicalLink slot="head" />
+  <ProductJsonLd slot="head" product={product} categoryTitle={categoryTitle} url={canonicalUrl} />
+
+  <div class="-mx-6 bg-gradient-to-t from-[var(--brand-accent-soft-2)] via-[var(--brand-accent-soft)] to-white">
+    <section class="relative overflow-hidden bg-transparent">
+      <div class="pointer-events-none absolute -right-12 -top-16 h-48 w-48 rounded-full bg-[var(--brand-accent)]/20 blur-3xl"></div>
+      <div class="relative mx-auto max-w-6xl px-6 pt-32 pb-16 sm:pt-36 sm:pb-20 lg:pt-40">
+        <nav class="breadcrumbs hero-breadcrumbs" aria-label="breadcrumbs">
+          <a href="/ryba/">Рыба для пруда</a>
+          {category ? <a href={`/ryba/${category.slug}/`}>{category.title}</a> : null}
+          <span aria-current="page">{product.name}</span>
+        </nav>
+        <div class="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
+          <div class="max-w-2xl">
+            <h1 class="mt-4 text-3xl font-semibold text-gray-900 sm:text-4xl">{product.name}</h1>
+            <p class="mt-3 text-2xl font-semibold text-[var(--brand-accent)]">{product.priceFrom}</p>
+            {descriptionParagraphs.length ? (
+              <div class="mt-3 space-y-3 text-base text-gray-600">
+                {descriptionParagraphs.map((paragraph) => (
+                  <p>
+                    {paragraph.split('\n').map((line, index, items) => (
+                      <>
+                        {line}
+                        {index < items.length - 1 ? <br /> : null}
+                      </>
+                    ))}
+                  </p>
+                ))}
+              </div>
+            ) : null}
+          </div>
+          <div class="w-full max-w-sm self-start rounded-3xl border border-[var(--brand-accent-border)] bg-white/90 p-4 shadow-[0_16px_32px_rgba(15,10,5,0.08)] lg:mt-2">
+            <div class="overflow-hidden rounded-2xl bg-white p-4">
+              <OptimizedImage
+                src={product.image}
+                alt={product.name}
+                class="h-56 w-full object-contain"
+                decoding="async"
+                fetchpriority="high"
+              />
+            </div>
+            <a
+              class="mt-4 inline-flex w-full items-center justify-center rounded-full bg-[var(--brand-accent)] px-4 py-2 text-sm font-semibold text-white shadow-[0_10px_24px_rgba(0,0,0,0.25)] transition hover:bg-[var(--brand-accent-dark)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--brand-accent)]"
+              href="#buy"
+            >
+              Купить
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  {product.priceTables?.length ? (
+    <section class="mx-auto mt-2 max-w-6xl px-6">
+      <div class="mb-8 h-px bg-[var(--brand-accent-border)]"></div>
+      <div class="flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <p class="text-xs font-semibold uppercase tracking-[0.3em] text-[var(--brand-accent)]">Прайс</p>
+          <h2 class="mt-2 text-2xl font-semibold">Цены</h2>
+        </div>
+      </div>
+
+      <div class="mt-5 grid gap-5 lg:grid-cols-2">
+        {product.priceTables.map((table) => (
+          <div class="rounded-3xl border border-[var(--brand-accent-border)] bg-white/90 p-5 shadow-[0_16px_32px_rgba(15,10,5,0.08)]">
+            <div class="flex flex-wrap items-baseline justify-between gap-2">
+              <h3 class="text-lg font-semibold text-gray-900">{table.title}</h3>
+              {table.note ? (
+                <p class="rounded-full border border-[var(--brand-accent-border)] bg-white/80 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-[var(--brand-accent-dark)]">
+                  {table.note}
+                </p>
+              ) : null}
+            </div>
+            <div class="mt-4 overflow-x-auto">
+              <table class="min-w-full text-left text-sm">
+                <thead class="text-[11px] uppercase tracking-[0.3em] text-gray-500">
+                  <tr>
+                    <th class="py-2 pr-4">Объём</th>
+                    <th class="py-2">Цена</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-[var(--brand-accent-border)]">
+                  {table.rows.map((row) => (
+                    <tr class="transition hover:bg-[var(--brand-accent-soft)]/60">
+                      <td class="py-2 pr-4 text-gray-700">{row.volume}</td>
+                      <td class="py-2 font-semibold text-gray-900">{row.price}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+  ) : null}
+
+  <div class="mx-auto mt-10 max-w-6xl space-y-8 px-6 pb-12 catalog-theme">
+    <div id="buy" class="catalog-card">
+      <LeadForm title="Запросить наличие" submitLabel="Отправить заявку" />
+    </div>
+
+    <div class="catalog-card">
+      <FaqList title="Частые вопросы" items={faqItems} />
+    </div>
+
+    <div class="catalog-card">
+      <RelatedProducts items={relatedItems} />
     </div>
   </div>
+  </div>
+
+  <style>
+    .hero-breadcrumbs {
+      color: #6b7280;
+    }
+
+    .hero-breadcrumbs a {
+      color: var(--brand-accent);
+      font-weight: 600;
+    }
+
+    .hero-breadcrumbs > * + *::before {
+      color: #94a3b8;
+    }
+
+    .catalog-theme > .catalog-card > section {
+      margin-top: 0;
+      border-radius: 24px;
+      border: 1px solid var(--brand-accent-border);
+      background: rgba(255, 255, 255, 0.9);
+      box-shadow: 0 16px 32px rgba(15, 10, 5, 0.08);
+    }
+
+    .catalog-theme input,
+    .catalog-theme textarea {
+      border-color: var(--brand-accent-border);
+      background: #ffffff;
+    }
+
+    .catalog-theme button {
+      border-color: var(--brand-accent);
+      background: var(--brand-accent);
+      color: #ffffff;
+    }
+
+    .catalog-theme button:hover {
+      background: var(--brand-accent-dark);
+    }
+  </style>
 </BaseLayout>

@@ -1,6 +1,7 @@
 ---
 import '../styles/global.css';
 import Header from '../components/Header.astro';
+import { CONTACT_EMAIL } from '../consts/site';
 import ryba from '../data/catalog/ryba.json';
 
 const { title, description, hero = false, flushBottom = false } = Astro.props;
@@ -85,8 +86,8 @@ const mainClass = `px-6 ${flushBottom ? 'pb-0' : 'pb-10'} ${
                 </a>
               </li>
               <li>
-                <a class="transition hover:text-white" href="mailto:rybazdesest@mail.ru">
-                  rybazdesest@mail.ru
+                <a class="transition hover:text-white" href={`mailto:${CONTACT_EMAIL}`}>
+                  {CONTACT_EMAIL}
                 </a>
               </li>
               <li>Ежедневно 24/7</li>

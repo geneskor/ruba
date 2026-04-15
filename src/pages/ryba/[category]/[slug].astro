@@ -6,6 +6,8 @@ import LeadForm from '../../../components/LeadForm.astro';
 import FaqList from '../../../components/FaqList.astro';
 import RelatedProducts from '../../../components/RelatedProducts.astro';
 import OptimizedImage from '../../../components/OptimizedImage.astro';
+import fs from 'node:fs';
+import path from 'node:path';
 import ryba from '../../../data/catalog/ryba.json';
 import productFaq from '../../../data/product-faq.json';
 import productFaqBySlug from '../../../data/product-faq-by-slug.json';
@@ -20,10 +22,10 @@ export async function getStaticPaths() {
 const { product } = Astro.props;
 const category = ryba.categories.find((entry) => entry.slug === product.category);
 const categoryTitle = category ? category.title : 'Рыба для пруда';
-const seoTitle = `${product.name} — купить с доставкой по Москве`;
-const seoDescription = `${product.name} из категории «${categoryTitle}». Доставка по Москве и области, актуальные условия и консультация.`;
-const path = Astro.url.pathname === '/' ? '/' : Astro.url.pathname.endsWith('/') ? Astro.url.pathname : `${Astro.url.pathname}/`;
-const canonicalUrl = Astro.site ? new URL(path, Astro.site).toString() : path;
+const seoTitle = `${product.name} — купить с доставкой по всей России`;
+const seoDescription = `${product.name} из категории «${categoryTitle}». Доставка по всей России, актуальные условия и консультация.`;
+const pagePath = Astro.url.pathname === '/' ? '/' : Astro.url.pathname.endsWith('/') ? Astro.url.pathname : `${Astro.url.pathname}/`;
+const canonicalUrl = Astro.site ? new URL(pagePath, Astro.site).toString() : pagePath;
 const descriptionParagraphs = (product.description ?? '')
   .split('\n\n')
   .map((paragraph) => paragraph.trim())
@@ -39,7 +41,34 @@ const relatedItems = [...sameCategory, ...fallback].slice(0, 3).map((item) => ({
   ...item,
   href: `/ryba/${item.category}/${item.slug}/`
 }));
-const faqItems = productFaqBySlug[product.slug] ?? productFaq;
+type FaqItem = { question: string; answer: string };
+const faqBySlug = productFaqBySlug as Record<string, FaqItem[]>;
+const faqItems = faqBySlug[product.slug] ?? (productFaq as FaqItem[]);
+const galleryImages = (() => {
+  if (!product.image) return [];
+  const fallbackImages = [product.image];
+  const imageDir = path.posix.dirname(product.image);
+  if (!imageDir || imageDir === '.') return fallbackImages;
+  const folderPath = path.join(process.cwd(), 'public', imageDir.replace(/^\/+/, ''));
+  try {
+    const files = fs
+      .readdirSync(folderPath, { withFileTypes: true })
+      .filter((entry) => entry.isFile())
+      .map((entry) => entry.name)
+      .filter((name) => /\.png$/i.test(name))
+      .sort((a, b) => a.localeCompare(b, 'ru'));
+    if (!files.length) return fallbackImages;
+    const images = files.map((file) => path.posix.join(imageDir, file));
+    const current = product.image;
+    if (images.includes(current)) {
+      return [current, ...images.filter((item) => item !== current)];
+    }
+    return images;
+  } catch (error) {
+    return fallbackImages;
+  }
+})();
+const hasGallery = galleryImages.length > 1;
 ---
 
 <BaseLayout title={seoTitle} description={seoDescription} hero flushBottom>
@@ -76,13 +105,36 @@ const faqItems = productFaqBySlug[product.slug] ?? productFaq;
           </div>
           <div class="w-full max-w-sm self-start rounded-3xl border border-[var(--brand-accent-border)] bg-white/90 p-4 shadow-[0_16px_32px_rgba(15,10,5,0.08)] lg:mt-2">
             <div class="overflow-hidden rounded-2xl bg-white p-4">
-              <OptimizedImage
-                src={product.image}
-                alt={product.name}
-                class="h-56 w-full object-contain"
-                decoding="async"
-                fetchpriority="high"
-              />
+              <div class="product-gallery" data-gallery-root>
+                <div class="gallery-track" data-gallery-track>
+                  {galleryImages.map((image, index) => (
+                    <div class="gallery-slide">
+                      <OptimizedImage
+                        src={image}
+                        alt={product.name}
+                        class="h-56 w-full object-contain"
+                        decoding="async"
+                        fetchpriority={index === 0 ? 'high' : undefined}
+                        loading={index === 0 ? 'eager' : 'lazy'}
+                      />
+                    </div>
+                  ))}
+                </div>
+                {hasGallery ? (
+                  <div class="gallery-controls">
+                    <button class="gallery-nav gallery-prev" type="button" aria-label="Предыдущее фото" data-gallery-prev>
+                      <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M15 6l-6 6 6 6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+                      </svg>
+                    </button>
+                    <button class="gallery-nav gallery-next" type="button" aria-label="Следующее фото" data-gallery-next>
+                      <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+                      </svg>
+                    </button>
+                  </div>
+                ) : null}
+              </div>
             </div>
             <a
               class="mt-4 inline-flex w-full items-center justify-center rounded-full bg-[var(--brand-accent)] px-4 py-2 text-sm font-semibold text-white shadow-[0_10px_24px_rgba(0,0,0,0.25)] transition hover:bg-[var(--brand-accent-dark)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--brand-accent)]"
@@ -155,6 +207,42 @@ const faqItems = productFaqBySlug[product.slug] ?? productFaq;
   </div>
   </div>
 
+  <script>
+    const galleryRoots = document.querySelectorAll('[data-gallery-root]');
+
+    galleryRoots.forEach((root) => {
+      const track = root.querySelector('[data-gallery-track]');
+      const prev = root.querySelector('[data-gallery-prev]');
+      const next = root.querySelector('[data-gallery-next]');
+
+      if (!track || !prev || !next) return;
+
+      const slides = Array.from(track.querySelectorAll('.gallery-slide'));
+      if (!slides.length) return;
+
+      const getSlideWidth = () => slides[0].clientWidth || track.clientWidth;
+      const getIndex = () => {
+        const width = getSlideWidth();
+        if (!width) return 0;
+        return Math.round(track.scrollLeft / width);
+      };
+
+      prev.addEventListener('click', () => {
+        const width = getSlideWidth();
+        if (!width) return;
+        const nextIndex = (getIndex() - 1 + slides.length) % slides.length;
+        track.scrollTo({ left: nextIndex * width, behavior: 'smooth' });
+      });
+
+      next.addEventListener('click', () => {
+        const width = getSlideWidth();
+        if (!width) return;
+        const nextIndex = (getIndex() + 1) % slides.length;
+        track.scrollTo({ left: nextIndex * width, behavior: 'smooth' });
+      });
+    });
+  </script>
+
   <style>
     .hero-breadcrumbs {
       color: #6b7280;
@@ -191,6 +279,60 @@ const faqItems = productFaqBySlug[product.slug] ?? productFaq;
 
     .catalog-theme button:hover {
       background: var(--brand-accent-dark);
+    }
+
+    .product-gallery {
+      display: grid;
+      gap: 12px;
+    }
+
+    .gallery-track {
+      display: flex;
+      gap: 0;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      scroll-behavior: smooth;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+
+    .gallery-track::-webkit-scrollbar {
+      width: 0;
+      height: 0;
+    }
+
+    .gallery-slide {
+      flex: 0 0 100%;
+      scroll-snap-align: center;
+    }
+
+    .gallery-nav {
+      width: 36px;
+      height: 36px;
+      border-radius: 999px;
+      border: 1px solid var(--brand-accent-border);
+      background: rgba(255, 255, 255, 0.92);
+      color: var(--brand-accent);
+      display: grid;
+      place-items: center;
+      box-shadow: 0 10px 20px rgba(15, 10, 5, 0.12);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .gallery-nav:hover {
+      transform: scale(1.04);
+      box-shadow: 0 14px 24px rgba(15, 10, 5, 0.16);
+    }
+
+    .gallery-controls {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .gallery-nav svg {
+      width: 18px;
+      height: 18px;
     }
   </style>
 </BaseLayout>

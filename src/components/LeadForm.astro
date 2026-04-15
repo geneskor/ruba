@@ -1,12 +1,13 @@
 ---
+import { CONTACT_EMAIL } from '../consts/site';
+
 const {
   title = 'Оставить заявку',
   description = 'Заполните форму, и мы свяжемся с вами в ближайшее время.',
   submitLabel = 'Отправить'
 } = Astro.props;
 
-const formEmail = 'rybazdesest@mail.ru';
-const formAction = `https://formsubmit.co/${formEmail}`;
+const formAction = `https://formsubmit.co/${CONTACT_EMAIL}`;
 const formSource = Astro.url?.pathname ?? '/';
 const thankYouPath = '/spasibo/';
 ---
@@ -77,19 +78,19 @@ const thankYouPath = '/spasibo/';
   </div>
 </section>
 
-<script>
-  const phoneInputs = document.querySelectorAll('.lead-form input[name="phone"]');
-  const leadForms = document.querySelectorAll('.lead-form form');
+<script lang="ts">
+  const phoneInputs = document.querySelectorAll<HTMLInputElement>('.lead-form input[name="phone"]');
+  const leadForms = document.querySelectorAll<HTMLFormElement>('.lead-form form');
 
   leadForms.forEach((form) => {
-    const nextInput = form.querySelector('input[name="_next"]');
+    const nextInput = form.querySelector<HTMLInputElement>('input[name="_next"]');
     if (nextInput && window.location?.origin) {
       nextInput.value = new URL(nextInput.value, window.location.origin).toString();
     }
   });
 
   phoneInputs.forEach((phoneInput) => {
-    const formatPhone = (value) => {
+    const formatPhone = (value: string) => {
       let digits = value.replace(/\D/g, '');
       if (!digits) return '';
       if (digits.startsWith('8')) {
@@ -108,7 +109,7 @@ const thankYouPath = '/spasibo/';
       return result;
     };
 
-    const caretFromDigits = (value, digitsCount) => {
+    const caretFromDigits = (value: string, digitsCount: number) => {
       if (digitsCount <= 0) return 0;
       let count = 0;
       for (let i = 0; i < value.length; i += 1) {
@@ -118,8 +119,9 @@ const thankYouPath = '/spasibo/';
       return value.length;
     };
 
-    const onInput = (event) => {
-      const target = event.target;
+    const onInput = (event: Event) => {
+      const target = event.currentTarget;
+      if (!(target instanceof HTMLInputElement)) return;
       const prevValue = target.value;
       const caret = target.selectionStart ?? prevValue.length;
       const digitsBefore = prevValue.slice(0, caret).replace(/\D/g, '').length;

@@ -1,0 +1,79 @@
+{
+  "videos": [
+    {
+      "src": "/videos/IMG_4244.MP4",
+      "poster": "/videos/posters/IMG_4244.MP4.png",
+      "title": "Золотой горбатый карась"
+    },
+    {
+      "src": "/videos/IMG_4254.MP4",
+      "poster": "/videos/posters/IMG_4254.MP4.png",
+      "title": "Линь"
+    },
+    {
+      "src": "/videos/IMG_4437.mp4",
+      "poster": "/videos/posters/IMG_4437.mp4.png",
+      "title": "Черный Амур"
+    },
+    {
+      "src": "/videos/IMG_4438.mp4",
+      "poster": "/videos/posters/IMG_4438.mp4.png",
+      "title": "Черный Амур"
+    },
+    {
+      "src": "/videos/IMG_4439.mp4",
+      "poster": "/videos/posters/IMG_4439.mp4.png",
+      "title": "Черный Амур"
+    },
+    {
+      "src": "/videos/IMG_4445.mp4",
+      "poster": "/videos/posters/IMG_4445.mp4.png",
+      "title": "Трофейный карп"
+    },
+    {
+      "src": "/videos/IMG_4446.mp4",
+      "poster": "/videos/posters/IMG_4446.mp4.png",
+      "title": "Запускаем Сазана!"
+    },
+    {
+      "src": "/videos/IMG_4449.mp4",
+      "poster": "/videos/posters/IMG_4449.mp4.png",
+      "title": "Запуск белого Амура"
+    },
+    {
+      "src": "/videos/IMG_4834.mp4",
+      "poster": "/videos/posters/IMG_4834.mp4.png",
+      "title": "Серебряный Карась"
+    },
+    {
+      "src": "/videos/IMG_5150.mp4",
+      "poster": "/videos/posters/IMG_5150.mp4.png",
+      "title": "Белуга"
+    },
+    {
+      "src": "/videos/IMG_5159.mp4",
+      "poster": "/videos/posters/IMG_5159.mp4.png",
+      "title": "Запуск белуги и белого Амура"
+    },
+    {
+      "src": "/videos/IMG_5162.mp4",
+      "poster": "/videos/posters/IMG_5162.mp4.png",
+      "title": "Запускаем белугу"
+    },
+    {
+      "src": "/videos/IMG_5165.mp4",
+      "poster": "/videos/posters/IMG_5165.mp4.png",
+      "title": "Запускаем крупного белого Амура"
+    },
+    {
+      "src": "/videos/IMG_5545.MP4",
+      "poster": "/videos/posters/IMG_5545.MP4.png",
+      "title": "Зарыбление мелким судаком"
+    },
+    {
+      "src": "/videos/IMG_5546.MP4",
+      "poster": "/videos/posters/IMG_5546.MP4.png",
+      "title": "Малек судачка"
+    }
+  ]
+}

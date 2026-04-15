@@ -3,10 +3,61 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import CanonicalLink from '../../components/CanonicalLink.astro';
 import ArticleCard from '../../components/ArticleCard.astro';
 import blog from '../../data/blog.json';
+import ryba from '../../data/catalog/ryba.json';
+import videosData from '../../data/videos.json';
 
 const posts = [...blog.posts].sort(
   (a, b) => new Date(b.date ?? 0).getTime() - new Date(a.date ?? 0).getTime()
 );
+const productLinks = Object.fromEntries(
+  ryba.products.map((product) => [product.id, `/ryba/${product.category}/${product.slug}/`])
+);
+
+const titleLinkParts = [
+  { text: 'Золотой горбатый карась', href: productLinks['zolotoy-gorbatyy-karas'] },
+  { text: 'Серебряный Карась', href: productLinks['serebryanyy-karas'] },
+  { text: 'белого Амура', href: productLinks['belyy-amur'] },
+  { text: 'Сазана', href: productLinks['sazan'] },
+  { text: 'Линь', href: productLinks.lin },
+  { text: 'линя', href: productLinks.lin },
+  { text: 'карп', href: productLinks.karp },
+  { text: 'судаком', href: productLinks.sudak },
+  { text: 'судачка', href: productLinks.sudak }
+].filter((part) => Boolean(part.href));
+
+const splitTitleIntoParts = (title) => {
+  if (!title) {
+    return [];
+  }
+
+  return titleLinkParts.reduce((segments, linkPart) => {
+    return segments.flatMap((segment) => {
+      if (segment.href) {
+        return [segment];
+      }
+
+      const index = segment.text.indexOf(linkPart.text);
+
+      if (index === -1) {
+        return [segment];
+      }
+
+      const before = segment.text.slice(0, index);
+      const after = segment.text.slice(index + linkPart.text.length);
+
+      return [
+        ...(before ? [{ text: before }] : []),
+        { text: linkPart.text, href: linkPart.href },
+        ...(after ? [{ text: after }] : [])
+      ];
+    });
+  }, [{ text: title }]);
+};
+
+const videos = videosData.videos.map((video) => ({
+  ...video,
+  titleParts: splitTitleIntoParts(video.title)
+}));
 ---
 
 <BaseLayout title="Блог" description="Статьи о зарыблении прудов, кормах и обслуживании водоёмов." hero>
@@ -30,6 +81,89 @@ const posts = [...blog.posts].sort(
         Разбираем практические сценарии: какой состав выбрать, как подготовить водоем и
         что делать после запуска рыбы.
       </p>
+    </div>
+  </section>
+
+  <section class="mx-auto mt-12 max-w-6xl">
+    <div class="flex flex-wrap items-end justify-between gap-4">
+      <div>
+        <p class="text-xs font-semibold uppercase tracking-[0.3em] text-[var(--brand-accent)]">
+          Видео
+        </p>
+        <h2 class="mt-2 text-2xl font-semibold">Реальные видео нашей рыбы и зарыбления</h2>
+        <p class="mt-2 text-sm text-gray-600">
+          Живые кадры, чтобы было проще выбрать и оставить заявку.
+        </p>
+      </div>
+    </div>
+
+    <div
+      class="mt-6 overflow-hidden rounded-[32px] border border-[var(--brand-accent-border)] bg-[linear-gradient(135deg,_rgba(79,188,198,0.12)_0%,_rgba(255,255,255,0.98)_48%,_rgba(191,234,237,0.55)_100%)] p-4 shadow-[0_18px_40px_rgba(15,10,5,0.08)] sm:p-6"
+      data-video-carousel
+    >
+      <div class="video-viewport mx-auto w-full max-w-[18rem] overflow-hidden sm:max-w-none" data-video-viewport>
+        <div
+          id="blog-video-strip"
+          class="video-strip flex w-full snap-x snap-mandatory gap-0 pb-2 sm:overflow-x-auto sm:gap-4"
+          data-video-strip
+        >
+          {videos.map((video, index) => (
+            <article class="video-slide relative w-full shrink-0 basis-full snap-start sm:w-[min(78vw,18rem)] sm:basis-auto">
+              <div class="mx-auto w-full max-w-[18rem]">
+                <div class="overflow-hidden rounded-[24px]">
+                  <video
+                    aria-label={video.title ?? `Видео из подборки ${index + 1}`}
+                    class="blog-video block aspect-[9/16] w-full object-cover"
+                    controls
+                    playsinline
+                    poster={video.poster}
+                    preload="metadata"
+                  >
+                    <source src={video.src} type="video/mp4" />
+                    Ваш браузер не поддерживает воспроизведение видео.
+                  </video>
+                </div>
+                {video.title ? (
+                  <p class="mt-3 px-1 text-sm font-semibold leading-snug text-slate-900">
+                    {video.titleParts.map((part) =>
+                      part.href ? (
+                        <a class="text-[var(--brand-accent-dark)] underline decoration-[color:rgba(18,50,71,0.28)] underline-offset-2 transition hover:text-[var(--brand-accent)] hover:decoration-[var(--brand-accent)]" href={part.href}>{part.text}</a>
+                      ) : (
+                        part.text
+                      )
+                    )}
+                  </p>
+                ) : null}
+              </div>
+            </article>
+          ))}
+        </div>
+      </div>
+      <div class="mt-4 flex w-full items-center justify-between sm:hidden">
+        <button
+          class="inline-flex h-10 w-10 items-center justify-center rounded-full border border-[var(--brand-accent-border)] bg-white/90 text-[var(--brand-accent-dark)] shadow-[0_10px_24px_rgba(15,10,5,0.12)] transition hover:border-[var(--brand-accent)] hover:bg-[var(--brand-accent-soft)] disabled:cursor-not-allowed disabled:border-slate-200 disabled:bg-white/70 disabled:text-slate-300 disabled:shadow-none"
+          type="button"
+          aria-controls="blog-video-strip"
+          aria-label="Предыдущее видео"
+          data-video-prev
+          disabled
+        >
+          <svg class="h-4 w-4" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M15 6l-6 6 6 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </button>
+        <button
+          class="inline-flex h-10 w-10 items-center justify-center rounded-full border border-[var(--brand-accent-border)] bg-white/90 text-[var(--brand-accent-dark)] shadow-[0_10px_24px_rgba(15,10,5,0.12)] transition hover:border-[var(--brand-accent)] hover:bg-[var(--brand-accent-soft)] disabled:cursor-not-allowed disabled:border-slate-200 disabled:bg-white/70 disabled:text-slate-300 disabled:shadow-none"
+          type="button"
+          aria-controls="blog-video-strip"
+          aria-label="Следующее видео"
+          data-video-next
+        >
+          <svg class="h-4 w-4" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </button>
+      </div>
     </div>
   </section>
 
@@ -63,8 +197,105 @@ const posts = [...blog.posts].sort(
 
   <script>
     const grid = document.querySelector('.article-grid');
+    const videoStrip = document.querySelector('[data-video-strip]');
+    const videoPrev = document.querySelector('[data-video-prev]');
+    const videoNext = document.querySelector('[data-video-next]');
+    const videoSlides = Array.from(document.querySelectorAll('.video-slide'));
+    const blogVideos = Array.from(document.querySelectorAll('.blog-video'));
+
+    const pauseOtherVideos = (activeVideo) => {
+      blogVideos.forEach((otherVideo) => {
+        if (otherVideo !== activeVideo) {
+          otherVideo.pause();
+        }
+      });
+    };
+
+    const syncActiveVideo = (event) => {
+      const target = event.target;
+
+      if (!(target instanceof HTMLVideoElement) || !target.classList.contains('blog-video')) {
+        return;
+      }
+
+      pauseOtherVideos(target);
+      window.setTimeout(() => {
+        blogVideos.forEach((otherVideo) => {
+          if (otherVideo !== target) {
+            otherVideo.pause();
+          }
+        });
+      }, 0);
+    };
+
+    if (videoStrip) {
+      videoStrip.addEventListener('play', syncActiveVideo, true);
+      videoStrip.addEventListener('playing', syncActiveVideo, true);
+    }
+
+    if (videoStrip && videoPrev && videoNext && videoSlides.length > 1) {
+      const getMaxIndex = () => Math.max(0, videoSlides.length - 1);
+      const isMobileVideoCarousel = () => window.matchMedia('(max-width: 639px)').matches;
+      let activeVideoIndex = 0;
+
+      const pauseAllVideos = () => {
+        blogVideos.forEach((video) => video.pause());
+      };
+
+      const syncVideoNav = () => {
+        videoPrev.disabled = activeVideoIndex <= 0;
+        videoNext.disabled = activeVideoIndex >= getMaxIndex();
+      };
+
+      const applyMobileVideoIndex = () => {
+        videoStrip.style.transform = `translate3d(-${activeVideoIndex * 100}%, 0, 0)`;
+        syncVideoNav();
+      };
+
+      const syncVideoMode = () => {
+        if (isMobileVideoCarousel()) {
+          applyMobileVideoIndex();
+          return;
+        }
+
+        videoStrip.style.removeProperty('transform');
+      };
+
+      const setActiveVideo = (index) => {
+        const safeIndex = Math.min(getMaxIndex(), Math.max(0, index));
+
+        if (safeIndex === activeVideoIndex) {
+          syncVideoNav();
+          return;
+        }
+
+        activeVideoIndex = safeIndex;
+        pauseAllVideos();
+        applyMobileVideoIndex();
+      };
+
+      videoPrev.addEventListener('click', () => {
+        if (!isMobileVideoCarousel()) {
+          return;
+        }
+
+        setActiveVideo(activeVideoIndex - 1);
+      });
+
+      videoNext.addEventListener('click', () => {
+        if (!isMobileVideoCarousel()) {
+          return;
+        }
+
+        setActiveVideo(activeVideoIndex + 1);
+      });
+
+      window.addEventListener('resize', syncVideoMode);
+      syncVideoMode();
+    }
+
     if (grid) {
-      let resizeTimer;
+      let resizeTimer = 0;
 
       const updateHeights = () => {
         grid.style.removeProperty('--article-title-height');
@@ -94,7 +325,7 @@ const posts = [...blog.posts].sort(
 
       const scheduleUpdate = () => {
         clearTimeout(resizeTimer);
-        resizeTimer = setTimeout(() => {
+        resizeTimer = window.setTimeout(() => {
           requestAnimationFrame(updateHeights);
         }, 120);
       };
@@ -108,4 +339,39 @@ const posts = [...blog.posts].sort(
       scheduleUpdate();
     }
   </script>
+
+  <style>
+    .blog-video {
+      background: transparent;
+      box-shadow: none;
+    }
+
+    .video-viewport {
+      touch-action: pan-y;
+    }
+
+    .video-strip {
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+
+    .video-strip::-webkit-scrollbar {
+      display: none;
+    }
+
+    @media (max-width: 639px) {
+      .video-strip {
+        overflow: visible;
+        scroll-snap-type: none;
+        transition: transform 0.35s ease;
+        will-change: transform;
+      }
+    }
+
+    @media (min-width: 640px) {
+      .video-strip {
+        transform: none;
+      }
+    }
+  </style>
 </BaseLayout>

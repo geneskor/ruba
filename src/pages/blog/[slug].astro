@@ -27,15 +27,20 @@ const productLinks = ryba.products.map((product) => ({
 const linkClass =
   'font-semibold text-[var(--brand-accent-dark)] underline-offset-4 transition hover:text-[var(--brand-accent)] hover:underline';
 
-const escapeRegExp = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-const buildWordPattern = (word) => {
+type BlogPost = (typeof blog.posts)[number];
+type ContentBlock = BlogPost['content'][number];
+type FaqItem = { question: string; answer: string };
+type MatchResult = { index: number; match: string; href: string };
+
+const escapeRegExp = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+const buildWordPattern = (word: string) => {
   const clean = word.toLowerCase();
   const length = clean.length;
   const stem = length <= 4 ? clean : length <= 6 ? clean.slice(0, -1) : clean.slice(0, -2);
   const suffixMax = length <= 4 ? 2 : length <= 6 ? 3 : 4;
   return `${escapeRegExp(stem)}[\\p{L}]{0,${suffixMax}}`;
 };
-const buildNameRegex = (name) => {
+const buildNameRegex = (name: string) => {
   const parts = name
     .split(/\s+/)
     .map((word) => word.trim())
@@ -50,8 +55,8 @@ const fishMatchers = productLinks.map((product) => ({
   regex: buildNameRegex(product.name)
 }));
 
-const findNextMatch = (text, startIndex) => {
-  let best = null;
+const findNextMatch = (text: string, startIndex: number): MatchResult | null => {
+  let best: MatchResult | null = null;
   for (const matcher of fishMatchers) {
     matcher.regex.lastIndex = startIndex;
     const match = matcher.regex.exec(text);
@@ -71,7 +76,7 @@ const findNextMatch = (text, startIndex) => {
   return best;
 };
 
-const escapeHtml = (value) =>
+const escapeHtml = (value: string) =>
   value
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
@@ -79,9 +84,9 @@ const escapeHtml = (value) =>
     .replace(/\"/g, '&quot;')
     .replace(/'/g, '&#39;');
 
-const linkifyTextToHtml = (text) => {
+const linkifyTextToHtml = (text: string) => {
   if (!text) return '';
-  const parts = [];
+  const parts: string[] = [];
   let cursor = 0;
 
   while (cursor < text.length) {
@@ -103,13 +108,13 @@ const linkifyTextToHtml = (text) => {
 
   return parts.join('');
 };
-const faqItems = [];
-const contentBlocks = [];
+const faqItems: FaqItem[] = [];
+const contentBlocks: ContentBlock[] = [];
 let inFaq = false;
-let currentQuestion = null;
-let currentAnswerParts = [];
+let currentQuestion: string | null = null;
+let currentAnswerParts: string[] = [];
 
-const normalizeHeading = (value) => value?.trim().toLowerCase();
+const normalizeHeading = (value?: string) => value?.trim().toLowerCase();
 const flushFaqItem = () => {
   if (!currentQuestion) return;
   const answer = currentAnswerParts.join(' ').replace(/\s+/g, ' ').trim();
@@ -118,7 +123,7 @@ const flushFaqItem = () => {
   currentAnswerParts = [];
 };
 
-post.content.forEach((block) => {
+post.content.forEach((block: ContentBlock) => {
   if (
     block &&
     typeof block === 'object' &&

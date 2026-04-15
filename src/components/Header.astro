@@ -2,7 +2,8 @@
 import OptimizedImage from './OptimizedImage.astro';
 
 const pathnameRaw = Astro.url?.pathname ?? '/';
-const normalize = (path) => (path.length > 1 && path.endsWith('/') ? path.slice(0, -1) : path);
+const normalize = (path: string) =>
+  path.length > 1 && path.endsWith('/') ? path.slice(0, -1) : path;
 const pathname = normalize(pathnameRaw);
 
 const navItems = [
@@ -11,21 +12,21 @@ const navItems = [
   { label: 'Блог', href: '/blog/' }
 ];
 
-const isActive = (href) => {
+const isActive = (href: string) => {
   if (href === '/ryba/') {
     return pathname.startsWith('/ryba') || pathname.startsWith('/catalog/ryba');
   }
   return pathname === normalize(href);
 };
 
-const linkClass = (href) =>
+const linkClass = (href: string) =>
   `rounded-full border border-white/35 px-4 py-2 text-[0.68rem] font-semibold uppercase tracking-[0.26em] transition ${
     isActive(href)
       ? 'bg-white text-[#0b1f2a] shadow-sm'
       : 'text-white/90 hover:border-white/60 hover:bg-white/15 hover:text-white'
   }`;
 
-const linkClassMobile = (href) =>
+const linkClassMobile = (href: string) =>
   `block rounded-lg px-3 py-2 text-sm font-semibold transition ${
     isActive(href)
       ? 'bg-[var(--brand-accent-soft)] text-[#0b1f2a]'

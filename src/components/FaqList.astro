@@ -64,10 +64,10 @@ const sectionClass = className?.trim() ? className : 'mt-10';
   }
 </style>
 
-<script>
-  const faqItems = document.querySelectorAll('.faq-item');
+<script lang="ts">
+  const faqItems = document.querySelectorAll<HTMLElement>('.faq-item');
   faqItems.forEach((item) => {
-    const summary = item.querySelector('summary');
+    const summary = item.querySelector<HTMLElement>('summary');
     if (!summary) return;
 
     const getClosedHeight = () => {
@@ -90,7 +90,7 @@ const sectionClass = className?.trim() ? className : 'mt-10';
           item.style.height = `${getClosedHeight()}px`;
         });
 
-        const onCloseEnd = (e) => {
+        const onCloseEnd = (e: TransitionEvent) => {
           if (e.propertyName !== 'height') return;
           item.removeAttribute('open');
           item.classList.remove('is-animating');
@@ -107,7 +107,7 @@ const sectionClass = className?.trim() ? className : 'mt-10';
           item.style.height = `${item.scrollHeight}px`;
         });
 
-        const onOpenEnd = (e) => {
+        const onOpenEnd = (e: TransitionEvent) => {
           if (e.propertyName !== 'height') return;
           item.classList.remove('is-animating');
           item.style.height = '';

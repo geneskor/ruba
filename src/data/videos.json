@@ -1,79 +1,109 @@
 {
   "videos": [
     {
-      "src": "/videos/IMG_4244.MP4",
-      "poster": "/videos/posters/IMG_4244.MP4.png",
-      "title": "Золотой горбатый карась"
+      "src": "/videos/optimized/hd/IMG_4244.mp4",
+      "poster": "/videos/posters/IMG_4244.MP4.webp",
+      "title": "Золотой горбатый карась",
+      "srcHd": "/videos/optimized/hd/IMG_4244.mp4",
+      "srcSd": "/videos/optimized/sd/IMG_4244.mp4"
     },
     {
-      "src": "/videos/IMG_4254.MP4",
-      "poster": "/videos/posters/IMG_4254.MP4.png",
-      "title": "Линь"
+      "src": "/videos/optimized/hd/IMG_4254.mp4",
+      "poster": "/videos/posters/IMG_4254.MP4.webp",
+      "title": "Линь",
+      "srcHd": "/videos/optimized/hd/IMG_4254.mp4",
+      "srcSd": "/videos/optimized/sd/IMG_4254.mp4"
     },
     {
-      "src": "/videos/IMG_4437.mp4",
-      "poster": "/videos/posters/IMG_4437.mp4.png",
-      "title": "Черный Амур"
+      "src": "/videos/optimized/hd/IMG_4437.mp4",
+      "poster": "/videos/posters/IMG_4437.mp4.webp",
+      "title": "Черный Амур",
+      "srcHd": "/videos/optimized/hd/IMG_4437.mp4",
+      "srcSd": "/videos/optimized/sd/IMG_4437.mp4"
     },
     {
-      "src": "/videos/IMG_4438.mp4",
-      "poster": "/videos/posters/IMG_4438.mp4.png",
-      "title": "Черный Амур"
+      "src": "/videos/optimized/hd/IMG_4438.mp4",
+      "poster": "/videos/posters/IMG_4438.mp4.webp",
+      "title": "Черный Амур",
+      "srcHd": "/videos/optimized/hd/IMG_4438.mp4",
+      "srcSd": "/videos/optimized/sd/IMG_4438.mp4"
     },
     {
-      "src": "/videos/IMG_4439.mp4",
-      "poster": "/videos/posters/IMG_4439.mp4.png",
-      "title": "Черный Амур"
+      "src": "/videos/optimized/hd/IMG_4439.mp4",
+      "poster": "/videos/posters/IMG_4439.mp4.webp",
+      "title": "Черный Амур",
+      "srcHd": "/videos/optimized/hd/IMG_4439.mp4",
+      "srcSd": "/videos/optimized/sd/IMG_4439.mp4"
     },
     {
-      "src": "/videos/IMG_4445.mp4",
-      "poster": "/videos/posters/IMG_4445.mp4.png",
-      "title": "Трофейный карп"
+      "src": "/videos/optimized/hd/IMG_4445.mp4",
+      "poster": "/videos/posters/IMG_4445.mp4.webp",
+      "title": "Трофейный карп",
+      "srcHd": "/videos/optimized/hd/IMG_4445.mp4",
+      "srcSd": "/videos/optimized/sd/IMG_4445.mp4"
     },
     {
-      "src": "/videos/IMG_4446.mp4",
-      "poster": "/videos/posters/IMG_4446.mp4.png",
-      "title": "Запускаем Сазана!"
+      "src": "/videos/optimized/hd/IMG_4446.mp4",
+      "poster": "/videos/posters/IMG_4446.mp4.webp",
+      "title": "Запускаем Сазана!",
+      "srcHd": "/videos/optimized/hd/IMG_4446.mp4",
+      "srcSd": "/videos/optimized/sd/IMG_4446.mp4"
     },
     {
-      "src": "/videos/IMG_4449.mp4",
-      "poster": "/videos/posters/IMG_4449.mp4.png",
-      "title": "Запуск белого Амура"
+      "src": "/videos/optimized/hd/IMG_4449.mp4",
+      "poster": "/videos/posters/IMG_4449.mp4.webp",
+      "title": "Запуск белого Амура",
+      "srcHd": "/videos/optimized/hd/IMG_4449.mp4",
+      "srcSd": "/videos/optimized/sd/IMG_4449.mp4"
     },
     {
-      "src": "/videos/IMG_4834.mp4",
-      "poster": "/videos/posters/IMG_4834.mp4.png",
-      "title": "Серебряный Карась"
+      "src": "/videos/optimized/hd/IMG_4834.mp4",
+      "poster": "/videos/posters/IMG_4834.mp4.webp",
+      "title": "Серебряный Карась",
+      "srcHd": "/videos/optimized/hd/IMG_4834.mp4",
+      "srcSd": "/videos/optimized/sd/IMG_4834.mp4"
     },
     {
-      "src": "/videos/IMG_5150.mp4",
-      "poster": "/videos/posters/IMG_5150.mp4.png",
-      "title": "Белуга"
+      "src": "/videos/optimized/hd/IMG_5150.mp4",
+      "poster": "/videos/posters/IMG_5150.mp4.webp",
+      "title": "Белуга",
+      "srcHd": "/videos/optimized/hd/IMG_5150.mp4",
+      "srcSd": "/videos/optimized/sd/IMG_5150.mp4"
     },
     {
-      "src": "/videos/IMG_5159.mp4",
-      "poster": "/videos/posters/IMG_5159.mp4.png",
-      "title": "Запуск белуги и белого Амура"
+      "src": "/videos/optimized/hd/IMG_5159.mp4",
+      "poster": "/videos/posters/IMG_5159.mp4.webp",
+      "title": "Запуск белуги и белого Амура",
+      "srcHd": "/videos/optimized/hd/IMG_5159.mp4",
+      "srcSd": "/videos/optimized/sd/IMG_5159.mp4"
     },
     {
-      "src": "/videos/IMG_5162.mp4",
-      "poster": "/videos/posters/IMG_5162.mp4.png",
-      "title": "Запускаем белугу"
+      "src": "/videos/optimized/hd/IMG_5162.mp4",
+      "poster": "/videos/posters/IMG_5162.mp4.webp",
+      "title": "Запускаем белугу",
+      "srcHd": "/videos/optimized/hd/IMG_5162.mp4",
+      "srcSd": "/videos/optimized/sd/IMG_5162.mp4"
     },
     {
-      "src": "/videos/IMG_5165.mp4",
-      "poster": "/videos/posters/IMG_5165.mp4.png",
-      "title": "Запускаем крупного белого Амура"
+      "src": "/videos/optimized/hd/IMG_5165.mp4",
+      "poster": "/videos/posters/IMG_5165.mp4.webp",
+      "title": "Запускаем крупного белого Амура",
+      "srcHd": "/videos/optimized/hd/IMG_5165.mp4",
+      "srcSd": "/videos/optimized/sd/IMG_5165.mp4"
     },
     {
-      "src": "/videos/IMG_5545.MP4",
-      "poster": "/videos/posters/IMG_5545.MP4.png",
-      "title": "Зарыбление мелким судаком"
+      "src": "/videos/optimized/hd/IMG_5545.mp4",
+      "poster": "/videos/posters/IMG_5545.MP4.webp",
+      "title": "Зарыбление мелким судаком",
+      "srcHd": "/videos/optimized/hd/IMG_5545.mp4",
+      "srcSd": "/videos/optimized/sd/IMG_5545.mp4"
     },
     {
-      "src": "/videos/IMG_5546.MP4",
-      "poster": "/videos/posters/IMG_5546.MP4.png",
-      "title": "Малек судачка"
+      "src": "/videos/optimized/hd/IMG_5546.mp4",
+      "poster": "/videos/posters/IMG_5546.MP4.webp",
+      "title": "Малек судачка",
+      "srcHd": "/videos/optimized/hd/IMG_5546.mp4",
+      "srcSd": "/videos/optimized/sd/IMG_5546.mp4"
     }
   ]
 }

@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="520" viewBox="0 0 800 520">
+  <rect width="800" height="520" fill="#e0f2fe" />
+  <rect x="80" y="90" width="640" height="340" rx="24" fill="#bae6fd" />
+  <circle cx="540" cy="260" r="46" fill="#7dd3fc" />
+  <path d="M220 260c80-80 220-80 300 0-80 80-220 80-300 0Z" fill="#38bdf8" />
+  <text x="400" y="460" text-anchor="middle" font-family="Arial, sans-serif" font-size="28" fill="#0369a1">Fish</text>
+</svg>

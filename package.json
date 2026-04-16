@@ -6,7 +6,8 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "optimize:videos": "./scripts/optimize-videos.sh"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.1.18",

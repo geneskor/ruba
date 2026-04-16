@@ -1,6 +1,12 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { CONTACT_EMAIL } from '../consts/site';
+
+const YANDEX_MAP_LAT = 55.859353;
+const YANDEX_MAP_LON = 37.182640;
+const YANDEX_MAP_POINT = `${YANDEX_MAP_LON},${YANDEX_MAP_LAT}`;
+const YANDEX_MAP_MARKER_STYLE = 'pm2blm';
+const YANDEX_MAP_LINK = `https://yandex.ru/maps/?ll=${YANDEX_MAP_LON}%2C${YANDEX_MAP_LAT}&z=17&pt=${YANDEX_MAP_POINT},${YANDEX_MAP_MARKER_STYLE}&text=Нахабино%20улица%20Володарского%203Б`;
 ---
 
 <BaseLayout
@@ -34,7 +40,7 @@ import { CONTACT_EMAIL } from '../consts/site';
         <div class="cards-grid grid gap-6 lg:grid-cols-3">
           <a
             class="contact-card focus-ring block border border-[var(--brand-accent-border)] bg-white/90 p-6 text-center transition hover:-translate-y-1 hover:shadow-[0_22px_46px_rgba(15,10,5,0.16)]"
-            href="https://maps.google.com/?q=Нахабино+улица+Володарского+3Б"
+            href={YANDEX_MAP_LINK}
             target="_blank"
             rel="noreferrer"
             aria-label="Нахабино, улица Володарского д.3Б"
@@ -129,18 +135,102 @@ import { CONTACT_EMAIL } from '../consts/site';
 
       <section class="mx-auto max-w-6xl pb-16">
         <div class="map-card border border-[var(--brand-accent-border)] bg-white/90">
-          <!-- TODO: замените src на актуальную ссылку карты -->
-          <iframe
-            title="Нахабино, улица Володарского д.3Б"
+          <div
+            id="contacts-map"
             class="map-frame focus-ring"
-            loading="lazy"
-            referrerpolicy="no-referrer-when-downgrade"
-            src="https://www.google.com/maps?q=Нахабино,+улица+Володарского+3Б&output=embed"
-          ></iframe>
+            role="region"
+            tabindex="0"
+            aria-label="Карта: Нахабино, улица Володарского д.3Б"
+            data-lat={String(YANDEX_MAP_LAT)}
+            data-lon={String(YANDEX_MAP_LON)}
+            data-link={YANDEX_MAP_LINK}
+          ></div>
         </div>
       </section>
     </div>
   </div>
+
+  <script is:inline>
+    (() => {
+      const mapElement = document.getElementById('contacts-map');
+      if (!mapElement) return;
+
+      const lat = Number(mapElement.dataset.lat);
+      const lon = Number(mapElement.dataset.lon);
+      const mapLink = mapElement.dataset.link ?? 'https://yandex.ru/maps/';
+      const center = [lat, lon];
+
+      const renderFallback = () => {
+        mapElement.classList.add('map-frame--fallback');
+        mapElement.innerHTML = `
+          <a class="map-open-link" href="${mapLink}" target="_blank" rel="noreferrer">
+            Открыть карту в Яндекс Картах
+          </a>
+        `;
+      };
+
+      const initMap = () => {
+        if (!window.ymaps || typeof window.ymaps.ready !== 'function') {
+          renderFallback();
+          return;
+        }
+
+        window.ymaps.ready(() => {
+          try {
+            const map = new window.ymaps.Map(
+              'contacts-map',
+              {
+                center,
+                zoom: 17,
+                controls: ['zoomControl'],
+              },
+              { suppressMapOpenBlock: true },
+            );
+
+            const fishPlacemark = new window.ymaps.Placemark(
+              center,
+              {
+                balloonContentHeader: 'Рыба в пруд',
+                balloonContentBody: 'Нахабино, улица Володарского д.3Б',
+              },
+              {
+                iconLayout: 'default#image',
+                iconImageHref: '/fish.svg',
+                iconImageSize: [54, 54],
+                iconImageOffset: [-27, -27],
+                hideIconOnBalloonOpen: false,
+              },
+            );
+
+            map.geoObjects.add(fishPlacemark);
+            map.behaviors.disable('scrollZoom');
+          } catch (_error) {
+            renderFallback();
+          }
+        });
+      };
+
+      if (window.ymaps) {
+        initMap();
+        return;
+      }
+
+      const existingScript = document.querySelector('script[data-yandex-maps="v2"]');
+      if (existingScript) {
+        existingScript.addEventListener('load', initMap, { once: true });
+        existingScript.addEventListener('error', renderFallback, { once: true });
+        return;
+      }
+
+      const script = document.createElement('script');
+      script.src = 'https://api-maps.yandex.ru/2.1/?lang=ru_RU';
+      script.async = true;
+      script.dataset.yandexMaps = 'v2';
+      script.addEventListener('load', initMap, { once: true });
+      script.addEventListener('error', renderFallback, { once: true });
+      document.head.appendChild(script);
+    })();
+  </script>
 
   <style>
     .contacts-page {
@@ -165,6 +255,30 @@ import { CONTACT_EMAIL } from '../consts/site';
       min-height: 360px;
       border: 0;
       display: block;
+    }
+
+    .map-frame--fallback {
+      display: grid;
+      place-items: center;
+      background: linear-gradient(140deg, #eaf6f8, #f7fcfc);
+      padding: 24px;
+    }
+
+    .map-open-link {
+      border-radius: 999px;
+      border: 1px solid var(--brand-accent-border);
+      background: white;
+      color: var(--color-primary);
+      font-weight: 600;
+      padding: 12px 18px;
+      text-decoration: none;
+      transition: transform 180ms ease, box-shadow 180ms ease;
+      box-shadow: 0 8px 18px rgba(11, 31, 42, 0.08);
+    }
+
+    .map-open-link:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 12px 22px rgba(11, 31, 42, 0.12);
     }
 
     .focus-ring:focus-visible {

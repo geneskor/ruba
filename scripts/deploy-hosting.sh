@@ -53,9 +53,7 @@ if [[ ! -d "$BUILD_DIR" ]]; then
   exit 1
 fi
 
-cd "$BUILD_DIR"
-
-total_files="$(find . -type f | wc -l | tr -d ' ')"
+total_files="$(find "$BUILD_DIR" -type f | wc -l | tr -d ' ')"
 if [[ "$total_files" == "0" ]]; then
   echo "Ошибка: в '$BUILD_DIR' нет файлов для публикации." >&2
   exit 1
@@ -63,36 +61,55 @@ fi
 
 echo "Загрузка $total_files файлов -> ${HOSTING_PROTOCOL}://${HOSTING_HOST}/${HOSTING_REMOTE_DIR}/"
 
-count=0
-while IFS= read -r file_path; do
-  rel_path="${file_path#./}"
-  target_url="${HOSTING_PROTOCOL}://${HOSTING_HOST}/${HOSTING_REMOTE_DIR}/${rel_path}"
-
-  curl_common_args=(
-    --silent
-    --show-error
-    --fail
-    --ftp-create-dirs
-    --connect-timeout 20
-    --max-time 180
-    --retry 5
-    --retry-delay 2
-    --retry-all-errors
-    --user "${HOSTING_USER}:${HOSTING_PASSWORD}"
-    -T "$file_path"
-    "$target_url"
-  )
-
+if command -v lftp >/dev/null 2>&1; then
+  lftp_ssl_force="false"
   if [[ "$HOSTING_PROTOCOL" == "ftps" ]]; then
-    curl --ssl-reqd "${curl_common_args[@]}" >/dev/null
-  else
-    curl "${curl_common_args[@]}" >/dev/null
+    lftp_ssl_force="true"
   fi
 
-  count=$((count + 1))
-  if (( count % 100 == 0 )) || (( count == total_files )); then
-    echo "Загружено: ${count}/${total_files}"
-  fi
-done < <(find . -type f | sort)
+  lftp -u "$HOSTING_USER","$HOSTING_PASSWORD" "${HOSTING_PROTOCOL}://${HOSTING_HOST}" -e "\
+    set cmd:fail-exit true; \
+    set net:max-retries 5; \
+    set net:timeout 20; \
+    set net:reconnect-interval-base 5; \
+    set ftp:passive-mode true; \
+    set ftp:ssl-force ${lftp_ssl_force}; \
+    mirror -R --delete --verbose=1 \"${BUILD_DIR}\" \"${HOSTING_REMOTE_DIR}\"; \
+    bye"
+else
+  cd "$BUILD_DIR"
+
+  count=0
+  while IFS= read -r file_path; do
+    rel_path="${file_path#./}"
+    target_url="${HOSTING_PROTOCOL}://${HOSTING_HOST}/${HOSTING_REMOTE_DIR}/${rel_path}"
+
+    curl_common_args=(
+      --silent
+      --show-error
+      --fail
+      --ftp-create-dirs
+      --connect-timeout 20
+      --max-time 180
+      --retry 5
+      --retry-delay 2
+      --retry-all-errors
+      --user "${HOSTING_USER}:${HOSTING_PASSWORD}"
+      -T "$file_path"
+      "$target_url"
+    )
+
+    if [[ "$HOSTING_PROTOCOL" == "ftps" ]]; then
+      curl --ssl-reqd "${curl_common_args[@]}" >/dev/null
+    else
+      curl "${curl_common_args[@]}" >/dev/null
+    fi
+
+    count=$((count + 1))
+    if (( count % 100 == 0 )) || (( count == total_files )); then
+      echo "Загружено: ${count}/${total_files}"
+    fi
+  done < <(find . -type f | sort)
+fi
 
 echo "Деплой завершен: https://rybasvprud.ru"

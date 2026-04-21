@@ -68,14 +68,25 @@ while IFS= read -r file_path; do
   rel_path="${file_path#./}"
   target_url="${HOSTING_PROTOCOL}://${HOSTING_HOST}/${HOSTING_REMOTE_DIR}/${rel_path}"
 
+  curl_common_args=(
+    --silent
+    --show-error
+    --fail
+    --ftp-create-dirs
+    --connect-timeout 20
+    --max-time 180
+    --retry 5
+    --retry-delay 2
+    --retry-all-errors
+    --user "${HOSTING_USER}:${HOSTING_PASSWORD}"
+    -T "$file_path"
+    "$target_url"
+  )
+
   if [[ "$HOSTING_PROTOCOL" == "ftps" ]]; then
-    curl --silent --show-error --fail --ssl-reqd --ftp-create-dirs \
-      --user "${HOSTING_USER}:${HOSTING_PASSWORD}" \
-      -T "$file_path" "$target_url" >/dev/null
+    curl --ssl-reqd "${curl_common_args[@]}" >/dev/null
   else
-    curl --silent --show-error --fail --ftp-create-dirs \
-      --user "${HOSTING_USER}:${HOSTING_PASSWORD}" \
-      -T "$file_path" "$target_url" >/dev/null
+    curl "${curl_common_args[@]}" >/dev/null
   fi
 
   count=$((count + 1))

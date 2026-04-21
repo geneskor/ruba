@@ -4,14 +4,23 @@
   "version": "0.0.1",
   "scripts": {
     "dev": "astro dev",
-    "build": "astro build",
+    "build": "npm run sync:sheet && astro build",
     "preview": "astro preview",
     "astro": "astro",
-    "optimize:videos": "./scripts/optimize-videos.sh"
+    "sheet:export": "node ./scripts/export-ryba-to-google-sheet-csv.mjs",
+    "sync:sheet": "node --env-file-if-exists=.env ./scripts/sync-ryba-from-google-sheet.mjs",
+    "optimize:videos": "./scripts/optimize-videos.sh",
+    "setup:vps": "./scripts/setup-vps.sh",
+    "deploy:vps": "./scripts/deploy-vps.sh",
+    "deploy:hosting": "./scripts/deploy-hosting.sh",
+    "check:domain": "./scripts/check-domain.sh"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.1.18",
     "astro": "^5.16.11",
     "tailwindcss": "^4.1.18"
+  },
+  "devDependencies": {
+    "@types/node": "^25.6.0"
   }
 }

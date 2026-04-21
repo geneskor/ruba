@@ -1,0 +1,47 @@
+name: Deploy From Sheets
+
+on:
+  workflow_dispatch:
+  repository_dispatch:
+    types:
+      - sheets_updated
+  schedule:
+    - cron: '*/5 * * * *'
+
+concurrency:
+  group: deploy-production
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+
+      - name: Install deps
+        run: npm ci
+
+      - name: Build with Google Sheets sync
+        env:
+          GOOGLE_SHEETS_RYBA_PRODUCTS_CSV_URL: ${{ secrets.GOOGLE_SHEETS_RYBA_PRODUCTS_CSV_URL }}
+          GOOGLE_SHEETS_RYBA_CATEGORIES_CSV_URL: ${{ secrets.GOOGLE_SHEETS_RYBA_CATEGORIES_CSV_URL }}
+        run: npm run build
+
+      - name: Deploy to shared hosting
+        env:
+          HOSTING_HOST: ${{ secrets.HOSTING_HOST }}
+          HOSTING_USER: ${{ secrets.HOSTING_USER }}
+          HOSTING_PASSWORD: ${{ secrets.HOSTING_PASSWORD }}
+          HOSTING_REMOTE_DIR: ${{ secrets.HOSTING_REMOTE_DIR }}
+          HOSTING_PROTOCOL: ${{ secrets.HOSTING_PROTOCOL }}
+          BUILD_DIR: dist
+          SKIP_BUILD: '1'
+        run: ./scripts/deploy-hosting.sh

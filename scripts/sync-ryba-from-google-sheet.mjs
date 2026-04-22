@@ -123,26 +123,126 @@ const applyNumberField = (product, key, value, context) => {
 const syncProducts = (data, records) => {
   const bySlug = new Map(data.products.map((item) => [item.slug, item]));
   const byId = new Map(data.products.map((item) => [item.id, item]));
+  const categorySet = new Set(data.categories.map((item) => item.slug));
 
   let updated = 0;
+  let created = 0;
   let skipped = 0;
+  const warnings = [];
 
   for (const record of records) {
-    const slug = readCell(record, ['slug']);
-    const id = readCell(record, ['id']);
+    const slugCell = readCell(record, ['slug']);
+    const idCell = readCell(record, ['id']);
+    const slug = String(slugCell || idCell || '').trim();
+    const id = String(idCell || slugCell || '').trim();
 
     if (!slug && !id) {
       skipped += 1;
+      warnings.push('пропуск строки: отсутствуют slug и id');
       continue;
     }
 
     const product = (slug && bySlug.get(slug)) || (id && byId.get(id));
     if (!product) {
-      skipped += 1;
+      const context = `новый товар ${slug}`;
+      const name = readCell(record, ['name', 'title', 'название']);
+      const category = readCell(record, ['category', 'category_slug']);
+      const priceRaw = readCell(record, ['price']);
+
+      if (!slug) {
+        skipped += 1;
+        warnings.push(`пропуск строки id="${id}": нужен slug`);
+        continue;
+      }
+
+      if (!name || !category || priceRaw === undefined || priceRaw === '') {
+        skipped += 1;
+        warnings.push(`${context}: нужны обязательные поля slug, name, category, price`);
+        continue;
+      }
+
+      if (!categorySet.has(category)) {
+        skipped += 1;
+        warnings.push(`${context}: категория "${category}" не найдена в categories`);
+        continue;
+      }
+
+      const newId = id || slug;
+      if (bySlug.has(slug) || byId.has(newId)) {
+        skipped += 1;
+        warnings.push(`${context}: дублирующийся slug/id`);
+        continue;
+      }
+
+      const createdProduct = {
+        id: newId,
+        slug,
+        name,
+        category
+      };
+
+      try {
+        applyNumberField(createdProduct, 'price', priceRaw, context);
+      } catch (error) {
+        skipped += 1;
+        warnings.push(error.message);
+        continue;
+      }
+
+      applyTextField(createdProduct, 'priceFrom', readCell(record, ['pricefrom', 'price_from', 'price_from_text']));
+      if (!createdProduct.priceFrom && createdProduct.price !== undefined) {
+        createdProduct.priceFrom = `от ${createdProduct.price} руб.`;
+      }
+
+      applyTextField(createdProduct, 'unit', readCell(record, ['unit']));
+      if (!createdProduct.unit) {
+        createdProduct.unit = 'шт';
+      }
+
+      applyTextField(createdProduct, 'shortDesc', readCell(record, ['shortdesc', 'short_desc']));
+      applyTextField(createdProduct, 'description', readCell(record, ['description']));
+      if (!createdProduct.shortDesc && createdProduct.description) {
+        createdProduct.shortDesc = createdProduct.description
+          .split('\n')
+          .map((line) => line.trim())
+          .find(Boolean);
+      }
+      if (!createdProduct.shortDesc) {
+        createdProduct.shortDesc = `${createdProduct.name} для зарыбления пруда.`;
+      }
+      applyTextField(createdProduct, 'image', readCell(record, ['image']));
+
+      const priceTablesJson = readCell(record, ['pricetables_json', 'price_tables_json']);
+      if (priceTablesJson) {
+        try {
+          const parsed = JSON.parse(priceTablesJson);
+          if (!Array.isArray(parsed)) {
+            throw new Error('ожидается массив');
+          }
+          createdProduct.priceTables = parsed;
+        } catch (error) {
+          skipped += 1;
+          warnings.push(`${context}: pricetables_json невалидный JSON (${error.message})`);
+          continue;
+        }
+      }
+
+      data.products.push(createdProduct);
+      bySlug.set(createdProduct.slug, createdProduct);
+      byId.set(createdProduct.id, createdProduct);
+      created += 1;
       continue;
     }
 
+    const previousSlug = product.slug;
+    const previousId = product.id;
     const context = `товар ${product.slug}`;
+
+    if (slug && slug !== product.slug && bySlug.has(slug)) {
+      skipped += 1;
+      warnings.push(`${context}: slug "${slug}" уже используется`);
+      continue;
+    }
 
     applyTextField(product, 'name', readCell(record, ['name', 'title', 'название']));
     applyTextField(product, 'slug', readCell(record, ['slug']));
@@ -167,10 +267,36 @@ const syncProducts = (data, records) => {
       }
     }
 
+    if (!categorySet.has(product.category)) {
+      throw new Error(`${context}: категория "${product.category}" не найдена в categories`);
+    }
+
+    if (!product.id) {
+      product.id = product.slug;
+    }
+
+    if (product.slug !== previousSlug) {
+      bySlug.delete(previousSlug);
+      bySlug.set(product.slug, product);
+    }
+
+    if (product.id !== previousId) {
+      byId.delete(previousId);
+      byId.set(product.id, product);
+    }
+
     updated += 1;
   }
 
-  return { updated, skipped };
+  if (warnings.length) {
+    console.warn(`Google Sheets sync: products warnings=${warnings.length}`);
+    warnings.slice(0, 20).forEach((message) => console.warn(` - ${message}`));
+    if (warnings.length > 20) {
+      console.warn(` - ... и еще ${warnings.length - 20} предупреждений`);
+    }
+  }
+
+  return { updated, created, skipped };
 };
 
 const syncCategories = (data, records) => {
@@ -212,7 +338,7 @@ const run = async () => {
     const csv = await fetchCsv(productsUrl, 'products CSV');
     const records = toRecords(csv);
     const result = syncProducts(data, records);
-    stats.push(`products: rows=${records.length}, updated=${result.updated}, skipped=${result.skipped}`);
+    stats.push(`products: rows=${records.length}, updated=${result.updated}, created=${result.created}, skipped=${result.skipped}`);
   }
 
   if (categoriesUrl) {
@@ -230,4 +356,3 @@ run().catch((error) => {
   console.error(`Google Sheets sync: FAIL (${error.message})`);
   process.exit(1);
 });
-

@@ -29,10 +29,8 @@ jobs:
       - name: Install deps
         run: npm ci
 
-      - name: Build with Google Sheets sync
+      - name: Build
         env:
-          GOOGLE_SHEETS_RYBA_PRODUCTS_CSV_URL: ${{ secrets.GOOGLE_SHEETS_RYBA_PRODUCTS_CSV_URL }}
-          GOOGLE_SHEETS_RYBA_CATEGORIES_CSV_URL: ${{ secrets.GOOGLE_SHEETS_RYBA_CATEGORIES_CSV_URL }}
           DIRECTUS_URL: ${{ secrets.DIRECTUS_URL }}
         run: npm run build
 

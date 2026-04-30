@@ -4,11 +4,9 @@
   "version": "0.0.1",
   "scripts": {
     "dev": "astro dev",
-    "build": "npm run sync:sheet && astro build",
+    "build": "astro build",
     "preview": "astro preview",
     "astro": "astro",
-    "sheet:export": "node ./scripts/export-ryba-to-google-sheet-csv.mjs",
-    "sync:sheet": "node --env-file-if-exists=.env ./scripts/sync-ryba-from-google-sheet.mjs",
     "optimize:videos": "./scripts/optimize-videos.sh",
     "setup:vps": "./scripts/setup-vps.sh",
     "deploy:vps": "./scripts/deploy-vps.sh",

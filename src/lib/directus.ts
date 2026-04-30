@@ -34,7 +34,7 @@ export interface Product {
   category: string;
   unit: string;
   price: number;
-  priceFrom?: boolean;
+  priceFrom: string;
   shortDesc: string;
   description: string;
   image: string;
@@ -104,7 +104,7 @@ export async function getCatalog(): Promise<Catalog> {
       category: p.category as string,
       unit: (p.unit ?? '') as string,
       price: (p.price ?? 0) as number,
-      priceFrom: (p.price_from ?? false) as boolean,
+      priceFrom: (p.price_from ?? '') as string,
       shortDesc: (p.short_desc ?? '') as string,
       description: (p.description ?? '') as string,
       image: assetUrl(p.image),

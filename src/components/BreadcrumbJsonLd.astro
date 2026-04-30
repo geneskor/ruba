@@ -1,0 +1,51 @@
+---
+type BreadcrumbItemInput = {
+  name?: string | null;
+  url?: string | null;
+};
+
+type BreadcrumbListItem = {
+  '@type': 'ListItem';
+  position: number;
+  name: string;
+  item: string;
+};
+
+interface Props {
+  items?: BreadcrumbItemInput[];
+}
+
+const { items = [] } = Astro.props as Props;
+const site = Astro.site;
+
+const toAbsoluteUrl = (url?: string | null): string | null => {
+  if (!url) return null;
+  if (/^https?:\/\//i.test(url)) return url;
+  const normalized = url.startsWith('/') ? url : `/${url}`;
+  return site ? new URL(normalized, site).toString() : normalized;
+};
+
+const itemListElement = items
+  .map((item: BreadcrumbItemInput, index: number): BreadcrumbListItem | null => {
+    const name = item?.name?.trim?.();
+    const itemUrl = toAbsoluteUrl(item?.url);
+    if (!name || !itemUrl) return null;
+    return {
+      '@type': 'ListItem',
+      position: index + 1,
+      name,
+      item: itemUrl
+    };
+  })
+  .filter((item): item is BreadcrumbListItem => Boolean(item));
+
+const data = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement
+};
+---
+
+{itemListElement.length ? (
+  <script is:inline type="application/ld+json" set:html={JSON.stringify(data)} />
+) : null}

@@ -1,5 +1,15 @@
 const BASE = (import.meta.env.DIRECTUS_URL ?? 'https://admin.rybasvprud.ru').replace(/\/$/, '');
 
+function assetUrl(value: unknown): string {
+  if (!value) return '';
+  const s = String(value);
+  // UUID from Directus Files → /assets/{uuid}
+  if (/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(s)) {
+    return `${BASE}/assets/${s}`;
+  }
+  return s;
+}
+
 async function fetchAll<T>(path: string): Promise<T[]> {
   const res = await fetch(`${BASE}${path}`);
   if (!res.ok) throw new Error(`Directus error ${res.status}: ${path}`);
@@ -95,7 +105,7 @@ export async function getCatalog(): Promise<Catalog> {
       priceFrom: (p.price_from ?? false) as boolean,
       shortDesc: (p.short_desc ?? '') as string,
       description: (p.description ?? '') as string,
-      image: (p.image ?? '') as string,
+      image: assetUrl(p.image),
       priceTables: (p.price_tables ?? []) as PriceTable[],
     })),
   };
@@ -117,7 +127,7 @@ export async function getBlog(): Promise<Blog> {
       description: (p.description ?? '') as string,
       excerpt: (p.excerpt ?? '') as string,
       date: (p.date ?? '') as string,
-      image: (p.image ?? '') as string,
+      image: assetUrl(p.image),
       content: (p.content ?? []) as unknown[],
     })),
   };

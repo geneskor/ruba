@@ -1,12 +1,10 @@
-name: Deploy From Sheets
+name: Deploy
 
 on:
   workflow_dispatch:
   repository_dispatch:
     types:
-      - sheets_updated
-  schedule:
-    - cron: '*/5 * * * *'
+      - deploy
 
 concurrency:
   group: deploy-production

@@ -1,19 +1,102 @@
 ---
 import '../styles/global.css';
 import Header from '../components/Header.astro';
-import { CONTACT_EMAIL } from '../consts/site';
+import {
+  BUSINESS_NAME,
+  CONTACT_ADDRESS_LINE,
+  CONTACT_CITY,
+  CONTACT_COUNTRY,
+  CONTACT_EMAIL,
+  CONTACT_LAT,
+  CONTACT_LON,
+  CONTACT_MAX_URL,
+  CONTACT_PHONE_DISPLAY,
+  CONTACT_PHONE_E164,
+  CONTACT_STREET,
+  CONTACT_WHATSAPP_URL,
+  CONTACT_YANDEX_MAP_URL,
+  GOOGLE_SITE_VERIFICATION,
+  YANDEX_VERIFICATION
+} from '../consts/site';
 import ryba from '../data/catalog/ryba.json';
 
-const { title, description, hero = false, flushBottom = false } = Astro.props;
+const {
+  title,
+  description,
+  hero = false,
+  flushBottom = false,
+  ogImagePath = '/images/blog/open-10.webp',
+  ogType = 'website'
+} = Astro.props;
 const mainClass = `px-6 ${flushBottom ? 'pb-0' : 'pb-10'} ${
   hero ? 'pt-0' : 'pt-32 md:pt-36 lg:pt-40'
 }`;
+const site = Astro.site;
+const pagePath = Astro.url?.pathname ?? '/';
+const normalizedPath = pagePath === '/' ? '/' : pagePath.endsWith('/') ? pagePath : `${pagePath}/`;
+const pageUrl = site ? new URL(normalizedPath, site).toString() : null;
+const ogImage = site ? new URL(ogImagePath, site).toString() : ogImagePath;
+const siteRoot = site ? new URL('/', site).toString() : 'https://rybasvprud.ru/';
+const logoUrl = site ? new URL('/fish.svg', site).toString() : '/fish.svg';
+const organizationJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': ['Organization', 'LocalBusiness'],
+  '@id': `${siteRoot}#organization`,
+  name: BUSINESS_NAME,
+  url: siteRoot,
+  logo: logoUrl,
+  image: logoUrl,
+  email: CONTACT_EMAIL,
+  telephone: CONTACT_PHONE_E164,
+  address: {
+    '@type': 'PostalAddress',
+    addressLocality: CONTACT_CITY,
+    streetAddress: CONTACT_STREET,
+    addressCountry: CONTACT_COUNTRY
+  },
+  geo: {
+    '@type': 'GeoCoordinates',
+    latitude: CONTACT_LAT,
+    longitude: CONTACT_LON
+  },
+  contactPoint: [
+    {
+      '@type': 'ContactPoint',
+      contactType: 'customer support',
+      telephone: CONTACT_PHONE_E164,
+      email: CONTACT_EMAIL,
+      areaServed: 'RU',
+      availableLanguage: ['ru']
+    }
+  ],
+  openingHoursSpecification: [
+    {
+      '@type': 'OpeningHoursSpecification',
+      dayOfWeek: [
+        'Monday',
+        'Tuesday',
+        'Wednesday',
+        'Thursday',
+        'Friday',
+        'Saturday',
+        'Sunday'
+      ],
+      opens: '00:00',
+      closes: '23:59'
+    }
+  ],
+  sameAs: [CONTACT_YANDEX_MAP_URL, CONTACT_WHATSAPP_URL, CONTACT_MAX_URL]
+};
 ---
 
 <html lang="ru">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" href="/favicon.ico?v=20260421" sizes="any" />
+    <link rel="icon" type="image/png" href="/images/ava.png?v=20260421" />
+    <link rel="shortcut icon" type="image/png" href="/images/ava.png?v=20260421" />
+    <link rel="apple-touch-icon" href="/images/ava.png?v=20260421" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -22,14 +105,54 @@ const mainClass = `px-6 ${flushBottom ? 'pb-0' : 'pb-10'} ${
     />
     <title>{title}</title>
     {description ? <meta name="description" content={description} /> : null}
+    <meta property="og:locale" content="ru_RU" />
+    <meta property="og:type" content={ogType} />
+    <meta property="og:site_name" content="Рыба здесь - есть!" />
+    <meta property="og:title" content={title} />
+    {description ? <meta property="og:description" content={description} /> : null}
+    {pageUrl ? <meta property="og:url" content={pageUrl} /> : null}
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:alt" content={title} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    {description ? <meta name="twitter:description" content={description} /> : null}
+    <meta name="twitter:image" content={ogImage} />
+    <meta name="yandex-verification" content={YANDEX_VERIFICATION} />
+    <meta name="google-site-verification" content={GOOGLE_SITE_VERIFICATION} />
+    <script is:inline type="application/ld+json" set:html={JSON.stringify(organizationJsonLd)} />
     <slot name="head" />
+    <!-- Yandex.Metrika counter -->
+    <script is:inline type="text/javascript">
+      (function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};m[i].l=1*new Date();for(var j=0;j<document.scripts.length;j++){if(document.scripts[j].src===r){return;}}k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})(window,document,'script','https://mc.yandex.ru/metrika/tag.js?id=108985083','ym');
+      ym(108985083,'init',{ssr:true,webvisor:true,clickmap:true,ecommerce:"dataLayer",referrer:document.referrer,url:location.href,accurateTrackBounce:true,trackLinks:true});
+    </script>
+    <noscript><div><img src="https://mc.yandex.ru/watch/108985083" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+    <!-- /Yandex.Metrika counter -->
   </head>
-  <body class="min-h-screen bg-sky-50">
+  <body class="min-h-screen bg-sky-50 pb-20 md:pb-0">
     <Header />
     <slot name="hero" />
     <main class={mainClass}>
       <slot />
     </main>
+    <a
+      class="fixed bottom-5 right-4 z-[60] inline-flex h-14 w-14 items-center justify-center rounded-full bg-[#0b1f2a] text-white ring-1 ring-white/25 transition hover:scale-105 active:scale-95 md:bottom-6 md:right-6"
+      href={`tel:${CONTACT_PHONE_E164}`}
+      aria-label={`Позвонить: ${CONTACT_PHONE_DISPLAY}`}
+    >
+      <svg
+        class="h-6 w-6"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.8"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
+      >
+        <path d="M5 4h4l2.2 5-2.2 1.2c1.7 3.3 4.1 5.7 7.4 7.4l1.2-2.2 5 2.2v4c-9.4 0-17-7.6-17-17Z" />
+      </svg>
+    </a>
     <footer class="border-t border-white/10 bg-[#0b1f2a] text-white">
       <div class="mx-auto max-w-6xl px-6 py-12">
         <div class="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
@@ -73,16 +196,16 @@ const mainClass = `px-6 ${flushBottom ? 'pb-0' : 'pb-10'} ${
               <li>
                 <a
                   class="transition hover:text-white"
-                  href="https://yandex.ru/maps/?ll=37.182640%2C55.859353&z=17&pt=37.182640,55.859353,pm2blm&text=Нахабино%20улица%20Володарского%203Б"
+                  href={CONTACT_YANDEX_MAP_URL}
                   target="_blank"
                   rel="noreferrer"
                 >
-                  Нахабино, ул. Володарского 3Б
+                  {CONTACT_ADDRESS_LINE}
                 </a>
               </li>
               <li>
-                <a class="transition hover:text-white" href="tel:+79993380337">
-                  +7 (999) 338-0-337
+                <a class="transition hover:text-white" href={`tel:${CONTACT_PHONE_E164}`}>
+                  {CONTACT_PHONE_DISPLAY}
                 </a>
               </li>
               <li>

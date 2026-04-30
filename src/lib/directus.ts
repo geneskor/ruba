@@ -1,4 +1,4 @@
-const BASE = (import.meta.env.DIRECTUS_URL ?? 'http://45.10.244.233:8055').replace(/\/$/, '');
+const BASE = (import.meta.env.DIRECTUS_URL ?? 'https://admin.rybasvprud.ru').replace(/\/$/, '');
 
 async function fetchAll<T>(path: string): Promise<T[]> {
   const res = await fetch(`${BASE}${path}`);

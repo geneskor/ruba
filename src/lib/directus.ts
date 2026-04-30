@@ -25,6 +25,7 @@ export interface Category {
 
 export interface PriceRow { volume: string; price: string }
 export interface PriceTable { title: string; rows: PriceRow[] }
+export interface FaqItem { question: string; answer: string }
 
 export interface Product {
   id: string;
@@ -38,6 +39,7 @@ export interface Product {
   description: string;
   image: string;
   priceTables: PriceTable[];
+  faq?: FaqItem[];
 }
 
 export type ContentBlock =
@@ -107,6 +109,7 @@ export async function getCatalog(): Promise<Catalog> {
       description: (p.description ?? '') as string,
       image: assetUrl(p.image),
       priceTables: (p.price_tables ?? []) as PriceTable[],
+      faq: Array.isArray(p.faq) && p.faq.length ? (p.faq as FaqItem[]) : undefined,
     })),
   };
 

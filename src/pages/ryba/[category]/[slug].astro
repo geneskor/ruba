@@ -51,7 +51,7 @@ const relatedItems = [...sameCategory, ...fallback].slice(0, 3).map((item) => ({
 }));
 type FaqItem = { question: string; answer: string };
 const faqBySlug = productFaqBySlug as Record<string, FaqItem[]>;
-const faqItems = faqBySlug[product.slug] ?? (productFaq as FaqItem[]);
+const faqItems = product.faq ?? faqBySlug[product.slug] ?? (productFaq as FaqItem[]);
 const galleryImages: string[] = (() => {
   if (!product.image) return [];
   const fallbackImages = [product.image];

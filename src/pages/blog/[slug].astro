@@ -5,32 +5,33 @@ import LeadForm from '../../components/LeadForm.astro';
 import FaqList from '../../components/FaqList.astro';
 import ArticleCard from '../../components/ArticleCard.astro';
 import OptimizedImage from '../../components/OptimizedImage.astro';
-import blog from '../../data/blog.json';
-import ryba from '../../data/catalog/ryba.json';
+import { getCatalog, getBlog, type BlogPost, type ContentBlock, type Product } from '../../lib/directus';
+
+type BlogPostWithImageAlt = BlogPost & { imageAlt?: string };
+type FaqItem = { question: string; answer: string };
+type MatchResult = { index: number; match: string; href: string };
 
 export async function getStaticPaths() {
+  const [ryba, blog] = await Promise.all([getCatalog(), getBlog()]);
   return blog.posts.map((post) => ({
     params: { slug: post.slug },
-    props: { post }
+    props: { post, allProducts: ryba.products, allPosts: blog.posts }
   }));
 }
 
-const { post } = Astro.props;
+const { post, allProducts, allPosts } = Astro.props as { post: BlogPostWithImageAlt; allProducts: Product[]; allPosts: BlogPost[] };
 const seoTitle = post.metaTitle ?? `${post.title} — блог`;
 const seoDescription = post.metaDescription ?? post.description ?? post.excerpt ?? '';
 const imageSrc = post.image ?? '/images/placeholder-article.svg';
 const imageAlt = post.imageAlt ?? post.title;
-const productLinks = ryba.products.map((product) => ({
+const site = Astro.site;
+const canonicalUrl = site ? new URL(Astro.url.pathname, site).toString() : Astro.url.pathname;
+const productLinks = allProducts.map((product: Product) => ({
   name: product.name,
   href: `/ryba/${product.category}/${product.slug}/`
 }));
 const linkClass =
   'font-semibold text-[var(--brand-accent-dark)] underline-offset-4 transition hover:text-[var(--brand-accent)] hover:underline';
-
-type BlogPost = (typeof blog.posts)[number];
-type ContentBlock = BlogPost['content'][number];
-type FaqItem = { question: string; answer: string };
-type MatchResult = { index: number; match: string; href: string };
 
 const escapeRegExp = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 const buildWordPattern = (word: string) => {
@@ -174,14 +175,95 @@ const faqItemsLinked = faqItems.map((item) => ({
   answer: linkifyTextToHtml(item.answer)
 }));
 
-const relatedPosts = blog.posts
-  .filter((item) => item.slug !== post.slug)
-  .sort((a, b) => new Date(b.date ?? 0).getTime() - new Date(a.date ?? 0).getTime())
+const relatedPosts = allPosts
+  .filter((item: BlogPost) => item.slug !== post.slug)
+  .sort((a: BlogPost, b: BlogPost) => new Date(b.date ?? 0).getTime() - new Date(a.date ?? 0).getTime())
   .slice(0, 3);
+
+const toIsoDate = (value?: string) => {
+  if (!value) return undefined;
+  const parsed = new Date(value);
+  return Number.isNaN(parsed.getTime()) ? undefined : parsed.toISOString();
+};
+
+const publishedAt = toIsoDate(post.date);
+const imageAbsolute = site ? new URL(imageSrc, site).toString() : imageSrc;
+const articleJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'BlogPosting',
+  headline: post.title,
+  description: seoDescription,
+  image: imageAbsolute ? [imageAbsolute] : undefined,
+  datePublished: publishedAt,
+  dateModified: publishedAt,
+  mainEntityOfPage: {
+    '@type': 'WebPage',
+    '@id': canonicalUrl
+  },
+  author: {
+    '@type': 'Organization',
+    name: 'Рыба здесь - есть!'
+  },
+  publisher: {
+    '@type': 'Organization',
+    name: 'Рыба здесь - есть!',
+    logo: {
+      '@type': 'ImageObject',
+      url: site ? new URL('/fish.svg', site).toString() : '/fish.svg'
+    }
+  },
+  inLanguage: 'ru-RU'
+};
+
+const absolutePath = (path: string) => (site ? new URL(path, site).toString() : path);
+const breadcrumbJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    {
+      '@type': 'ListItem',
+      position: 1,
+      name: 'Главная',
+      item: absolutePath('/')
+    },
+    {
+      '@type': 'ListItem',
+      position: 2,
+      name: 'Блог',
+      item: absolutePath('/blog/')
+    },
+    {
+      '@type': 'ListItem',
+      position: 3,
+      name: post.title,
+      item: canonicalUrl
+    }
+  ]
+};
+
+const faqJsonLd = faqItems.length
+  ? {
+      '@context': 'https://schema.org',
+      '@type': 'FAQPage',
+      mainEntity: faqItems.map((item) => ({
+        '@type': 'Question',
+        name: item.question,
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: item.answer
+        }
+      }))
+    }
+  : null;
 ---
 
-<BaseLayout title={seoTitle} description={seoDescription}>
+<BaseLayout title={seoTitle} description={seoDescription} ogType="article" ogImagePath={imageSrc}>
   <CanonicalLink slot="head" />
+  <script is:inline slot="head" type="application/ld+json" set:html={JSON.stringify(articleJsonLd)} />
+  <script is:inline slot="head" type="application/ld+json" set:html={JSON.stringify(breadcrumbJsonLd)} />
+  {faqJsonLd ? (
+    <script is:inline slot="head" type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
+  ) : null}
 
   <div class="mx-auto max-w-4xl">
     <nav class="breadcrumbs">
@@ -244,7 +326,7 @@ const relatedPosts = blog.posts
             return (
               <h2
                 class={`relative text-2xl font-semibold text-gray-900 ${index === 0 ? '' : 'mt-10'} pl-4 before:absolute before:left-0 before:top-2 before:h-5 before:w-1 before:rounded-full before:bg-[var(--brand-accent)] before:content-['']`}
-                set:html={linkifyTextToHtml(block.text)}
+                set:html={linkifyTextToHtml(block.text ?? '')}
               ></h2>
             );
           }
@@ -253,7 +335,7 @@ const relatedPosts = blog.posts
             return (
               <h3
                 class={`text-xl font-semibold text-gray-900 ${index === 0 ? '' : 'mt-6'}`}
-                set:html={linkifyTextToHtml(block.text)}
+                set:html={linkifyTextToHtml(block.text ?? '')}
               ></h3>
             );
           }
@@ -265,7 +347,7 @@ const relatedPosts = blog.posts
                   isPracticalList ? 'rounded-2xl border border-[var(--brand-accent-border)] bg-[var(--brand-accent-soft)]/40 p-5' : ''
                 }`}
               >
-                {block.items.map((item) => (
+                {(block.items ?? []).map((item: string) => (
                   <li set:html={linkifyTextToHtml(item)}></li>
                 ))}
               </ul>
@@ -283,7 +365,7 @@ const relatedPosts = blog.posts
                   isPracticalList ? 'rounded-2xl border border-[var(--brand-accent-border)] bg-[var(--brand-accent-soft)]/40 p-5' : ''
                 }`}
               >
-                {block.items.map((item) => (
+                {(block.items ?? []).map((item: string) => (
                   <li set:html={linkifyTextToHtml(item)}></li>
                 ))}
               </ol>
@@ -293,7 +375,7 @@ const relatedPosts = blog.posts
           return (
             <p
               class={`text-base leading-7 text-gray-700 ${index === 0 ? '' : 'mt-4'}`}
-              set:html={linkifyTextToHtml(block.text)}
+              set:html={linkifyTextToHtml(block.text ?? '')}
             ></p>
           );
         })}

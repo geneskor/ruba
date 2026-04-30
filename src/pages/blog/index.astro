@@ -2,16 +2,18 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import CanonicalLink from '../../components/CanonicalLink.astro';
 import ArticleCard from '../../components/ArticleCard.astro';
-import blog from '../../data/blog.json';
-import ryba from '../../data/catalog/ryba.json';
+import { getCatalog, getBlog } from '../../lib/directus';
 import videosData from '../../data/videos.json';
 
-const posts = [...blog.posts].sort(
-  (a, b) => new Date(b.date ?? 0).getTime() - new Date(a.date ?? 0).getTime()
-);
+const [ryba, blog] = await Promise.all([getCatalog(), getBlog()]);
+// Keep editorial order from data file (articles 1 -> 16).
+const posts = [...blog.posts];
 const productLinks = Object.fromEntries(
   ryba.products.map((product) => [product.id, `/ryba/${product.category}/${product.slug}/`])
-);
+ ) as Record<string, string | undefined>;
+
+type TitleSegment = { text: string; href?: string };
+type TitleLinkPart = { text: string; href: string };
 
 const titleLinkParts = [
   { text: 'Золотой горбатый карась', href: productLinks['zolotoy-gorbatyy-karas'] },
@@ -23,15 +25,15 @@ const titleLinkParts = [
   { text: 'карп', href: productLinks.karp },
   { text: 'судаком', href: productLinks.sudak },
   { text: 'судачка', href: productLinks.sudak }
-].filter((part) => Boolean(part.href));
+].filter((part): part is TitleLinkPart => Boolean(part.href));
 
-const splitTitleIntoParts = (title) => {
+const splitTitleIntoParts = (title?: string): TitleSegment[] => {
   if (!title) {
     return [];
   }
 
-  return titleLinkParts.reduce((segments, linkPart) => {
-    return segments.flatMap((segment) => {
+  return titleLinkParts.reduce<TitleSegment[]>((segments, linkPart) => {
+    return segments.flatMap((segment): TitleSegment[] => {
       if (segment.href) {
         return [segment];
       }
@@ -60,7 +62,11 @@ const videos = videosData.videos.map((video) => ({
 }));
 ---
 
-<BaseLayout title="Блог" description="Статьи о зарыблении прудов, кормах и обслуживании водоёмов." hero>
+<BaseLayout
+  title="Блог о зарыблении пруда и уходе за рыбой | Рыба здесь - есть!"
+  description="Практические статьи о зарыблении пруда: выбор видов рыбы, совместимость, кормление, зимовка и уход за водоемом."
+  hero
+>
   <CanonicalLink slot="head" />
 
   <section
@@ -174,7 +180,7 @@ const videos = videosData.videos.map((video) => ({
         <p class="text-xs font-semibold uppercase tracking-[0.3em] text-[var(--brand-accent)]">
           Подборка
         </p>
-        <h2 class="mt-2 text-2xl font-semibold">Свежие статьи</h2>
+        <h2 class="mt-2 text-2xl font-semibold">Статьи 1–16</h2>
         <p class="mt-2 text-sm text-gray-600">
           Собрали ключевые материалы, которые помогут разобраться с зарыблением.
         </p>

@@ -13,7 +13,8 @@
     "setup:vps": "./scripts/setup-vps.sh",
     "deploy:vps": "./scripts/deploy-vps.sh",
     "deploy:hosting": "./scripts/deploy-hosting.sh",
-    "check:domain": "./scripts/check-domain.sh"
+    "check:domain": "./scripts/check-domain.sh",
+    "setup:directus": "./scripts/setup-directus.sh"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.1.18",

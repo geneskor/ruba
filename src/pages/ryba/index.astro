@@ -3,8 +3,9 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import CanonicalLink from '../../components/CanonicalLink.astro';
 import CategoryCard from '../../components/CategoryCard.astro';
 import ProductCard from '../../components/ProductCard.astro';
-import ryba from '../../data/catalog/ryba.json';
+import { getCatalog } from '../../lib/directus';
 
+const ryba = await getCatalog();
 const categoriesWithItems = ryba.categories.map((category) => ({
   category,
   items: ryba.products.filter((item) => item.category === category.slug)
@@ -13,7 +14,11 @@ const categoryCount = ryba.categories.length;
 const productCount = ryba.products.length;
 ---
 
-<BaseLayout title="Каталог: Рыба для пруда" description={ryba.description} hero>
+<BaseLayout
+  title="Каталог рыбы для зарыбления пруда — цены 2026 | Рыба здесь - есть!"
+  description="Каталог рыбы для пруда: карп, амур, толстолобик, осетр, форель, декоративные виды и другие позиции для зарыбления."
+  hero
+>
   <CanonicalLink slot="head" />
 
   <div class="-mx-6">

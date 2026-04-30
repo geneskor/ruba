@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '../../../layouts/BaseLayout.astro';
 import CanonicalLink from '../../../components/CanonicalLink.astro';
+import BreadcrumbJsonLd from '../../../components/BreadcrumbJsonLd.astro';
 import ProductJsonLd from '../../../components/ProductJsonLd.astro';
 import LeadForm from '../../../components/LeadForm.astro';
 import FaqList from '../../../components/FaqList.astro';
@@ -8,34 +9,41 @@ import RelatedProducts from '../../../components/RelatedProducts.astro';
 import OptimizedImage from '../../../components/OptimizedImage.astro';
 import fs from 'node:fs';
 import path from 'node:path';
-import ryba from '../../../data/catalog/ryba.json';
+import { getCatalog, type Product } from '../../../lib/directus';
 import productFaq from '../../../data/product-faq.json';
 import productFaqBySlug from '../../../data/product-faq-by-slug.json';
 
 export async function getStaticPaths() {
+  const ryba = await getCatalog();
   return ryba.products.map((product) => ({
     params: { category: product.category, slug: product.slug },
-    props: { product }
+    props: { product, categories: ryba.categories, allProducts: ryba.products }
   }));
 }
 
-const { product } = Astro.props;
-const category = ryba.categories.find((entry) => entry.slug === product.category);
+const { product, categories, allProducts } = Astro.props as { product: Product; categories: import('../../../lib/directus').Category[]; allProducts: Product[] };
+const category = categories.find((entry) => entry.slug === product.category);
 const categoryTitle = category ? category.title : 'Рыба для пруда';
 const seoTitle = `${product.name} — купить с доставкой по всей России`;
 const seoDescription = `${product.name} из категории «${categoryTitle}». Доставка по всей России, актуальные условия и консультация.`;
 const pagePath = Astro.url.pathname === '/' ? '/' : Astro.url.pathname.endsWith('/') ? Astro.url.pathname : `${Astro.url.pathname}/`;
 const canonicalUrl = Astro.site ? new URL(pagePath, Astro.site).toString() : pagePath;
+const breadcrumbItems = [
+  { name: 'Главная', url: '/' },
+  { name: 'Рыба для пруда', url: '/ryba/' },
+  ...(category ? [{ name: category.title, url: `/ryba/${category.slug}/` }] : []),
+  { name: product.name, url: pagePath }
+];
 const descriptionParagraphs = (product.description ?? '')
   .split('\n\n')
   .map((paragraph) => paragraph.trim())
   .filter(Boolean);
 
-const sameCategory = ryba.products.filter(
-  (item) => item.category === product.category && item.slug !== product.slug
+const sameCategory = allProducts.filter(
+  (item: Product) => item.category === product.category && item.slug !== product.slug
 );
-const fallback = ryba.products.filter(
-  (item) => item.category !== product.category && item.slug !== product.slug
+const fallback = allProducts.filter(
+  (item: Product) => item.category !== product.category && item.slug !== product.slug
 );
 const relatedItems = [...sameCategory, ...fallback].slice(0, 3).map((item) => ({
   ...item,
@@ -44,7 +52,7 @@ const relatedItems = [...sameCategory, ...fallback].slice(0, 3).map((item) => ({
 type FaqItem = { question: string; answer: string };
 const faqBySlug = productFaqBySlug as Record<string, FaqItem[]>;
 const faqItems = faqBySlug[product.slug] ?? (productFaq as FaqItem[]);
-const galleryImages = (() => {
+const galleryImages: string[] = (() => {
   if (!product.image) return [];
   const fallbackImages = [product.image];
   const imageDir = path.posix.dirname(product.image);
@@ -53,15 +61,15 @@ const galleryImages = (() => {
   try {
     const files = fs
       .readdirSync(folderPath, { withFileTypes: true })
-      .filter((entry) => entry.isFile())
-      .map((entry) => entry.name)
-      .filter((name) => /\.png$/i.test(name))
-      .sort((a, b) => a.localeCompare(b, 'ru'));
+      .filter((entry: fs.Dirent) => entry.isFile())
+      .map((entry: fs.Dirent) => entry.name)
+      .filter((name: string) => /\.png$/i.test(name))
+      .sort((a: string, b: string) => a.localeCompare(b, 'ru'));
     if (!files.length) return fallbackImages;
-    const images = files.map((file) => path.posix.join(imageDir, file));
+    const images = files.map((file: string) => path.posix.join(imageDir, file));
     const current = product.image;
     if (images.includes(current)) {
-      return [current, ...images.filter((item) => item !== current)];
+      return [current, ...images.filter((item: string) => item !== current)];
     }
     return images;
   } catch (error) {
@@ -73,6 +81,7 @@ const hasGallery = galleryImages.length > 1;
 
 <BaseLayout title={seoTitle} description={seoDescription} hero flushBottom>
   <CanonicalLink slot="head" />
+  <BreadcrumbJsonLd slot="head" items={breadcrumbItems} />
   <ProductJsonLd slot="head" product={product} categoryTitle={categoryTitle} url={canonicalUrl} />
 
   <div class="-mx-6 bg-gradient-to-t from-[var(--brand-accent-soft-2)] via-[var(--brand-accent-soft)] to-white">
@@ -107,7 +116,7 @@ const hasGallery = galleryImages.length > 1;
             <div class="overflow-hidden rounded-2xl bg-white p-4">
               <div class="product-gallery" data-gallery-root>
                 <div class="gallery-track" data-gallery-track>
-                  {galleryImages.map((image, index) => (
+                  {galleryImages.map((image: string, index: number) => (
                     <div class="gallery-slide">
                       <OptimizedImage
                         src={image}
@@ -158,43 +167,50 @@ const hasGallery = galleryImages.length > 1;
       </div>
 
       <div class="mt-5 grid gap-5 lg:grid-cols-2">
-        {product.priceTables.map((table) => (
-          <div class="rounded-3xl border border-[var(--brand-accent-border)] bg-white/90 p-5 shadow-[0_16px_32px_rgba(15,10,5,0.08)]">
-            <div class="flex flex-wrap items-baseline justify-between gap-2">
-              <h3 class="text-lg font-semibold text-gray-900">{table.title}</h3>
-              {table.note ? (
-                <p class="rounded-full border border-[var(--brand-accent-border)] bg-white/80 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-[var(--brand-accent-dark)]">
-                  {table.note}
-                </p>
-              ) : null}
-            </div>
-            <div class="mt-4 overflow-x-auto">
-              <table class="min-w-full text-left text-sm">
-                <thead class="text-[11px] uppercase tracking-[0.3em] text-gray-500">
-                  <tr>
-                    <th class="py-2 pr-4">Объём</th>
-                    <th class="py-2">Цена</th>
-                  </tr>
-                </thead>
-                <tbody class="divide-y divide-[var(--brand-accent-border)]">
-                  {table.rows.map((row) => (
-                    <tr class="transition hover:bg-[var(--brand-accent-soft)]/60">
-                      <td class="py-2 pr-4 text-gray-700">{row.volume}</td>
-                      <td class="py-2 font-semibold text-gray-900">{row.price}</td>
+        {product.priceTables.map((table) => {
+          const tableNote = 'note' in table && typeof table.note === 'string' ? table.note : '';
+          return (
+            <div class="rounded-3xl border border-[var(--brand-accent-border)] bg-white/90 p-5 shadow-[0_16px_32px_rgba(15,10,5,0.08)]">
+              <div class="flex flex-wrap items-baseline justify-between gap-2">
+                <h3 class="text-lg font-semibold text-gray-900">{table.title}</h3>
+                {tableNote ? (
+                  <p class="rounded-full border border-[var(--brand-accent-border)] bg-white/80 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-[var(--brand-accent-dark)]">
+                    {tableNote}
+                  </p>
+                ) : null}
+              </div>
+              <div class="mt-4 overflow-x-auto">
+                <table class="min-w-full text-left text-sm">
+                  <thead class="text-[11px] uppercase tracking-[0.3em] text-gray-500">
+                    <tr>
+                      <th class="py-2 pr-4">Объём</th>
+                      <th class="py-2">Цена</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody class="divide-y divide-[var(--brand-accent-border)]">
+                    {table.rows.map((row) => (
+                      <tr class="transition hover:bg-[var(--brand-accent-soft)]/60">
+                        <td class="py-2 pr-4 text-gray-700">{row.volume}</td>
+                        <td class="py-2 font-semibold text-gray-900">{row.price}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </section>
   ) : null}
 
   <div class="mx-auto mt-10 max-w-6xl space-y-8 px-6 pb-12 catalog-theme">
     <div id="buy" class="catalog-card">
-      <LeadForm title="Запросить наличие" submitLabel="Отправить заявку" />
+      <LeadForm
+        title="Запросить наличие"
+        submitLabel="Отправить заявку"
+        productName={product.name}
+      />
     </div>
 
     <div class="catalog-card">

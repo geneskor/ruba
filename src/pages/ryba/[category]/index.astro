@@ -1,25 +1,35 @@
 ---
 import BaseLayout from '../../../layouts/BaseLayout.astro';
 import CanonicalLink from '../../../components/CanonicalLink.astro';
+import BreadcrumbJsonLd from '../../../components/BreadcrumbJsonLd.astro';
 import ProductCard from '../../../components/ProductCard.astro';
-import ryba from '../../../data/catalog/ryba.json';
+import { getCatalog } from '../../../lib/directus';
 
 export async function getStaticPaths() {
+  const ryba = await getCatalog();
   return ryba.categories.map((category) => ({
     params: { category: category.slug },
-    props: { category }
+    props: { category, allProducts: ryba.products, catalogDescription: ryba.description }
   }));
 }
 
-const { category } = Astro.props;
-const items = ryba.products.filter((item) => item.category === category.slug);
+const { category, allProducts, catalogDescription } = Astro.props;
+const items = allProducts.filter((item: { category: string }) => item.category === category.slug);
 const title = `Каталог: ${category.title}`;
-const description = category.description ?? ryba.description;
+const description = category.description ?? catalogDescription;
 const itemCount = items.length;
+const pagePath =
+  Astro.url.pathname === '/' ? '/' : Astro.url.pathname.endsWith('/') ? Astro.url.pathname : `${Astro.url.pathname}/`;
+const breadcrumbItems = [
+  { name: 'Главная', url: '/' },
+  { name: 'Рыба для пруда', url: '/ryba/' },
+  { name: category.title, url: pagePath }
+];
 ---
 
 <BaseLayout title={title} description={description} hero flushBottom>
   <CanonicalLink slot="head" />
+  <BreadcrumbJsonLd slot="head" items={breadcrumbItems} />
 
   <div class="-mx-6 bg-gradient-to-t from-[var(--brand-accent-soft-2)] via-[var(--brand-accent-soft)] to-white">
     <section class="relative overflow-hidden">

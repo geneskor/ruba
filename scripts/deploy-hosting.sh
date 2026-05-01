@@ -61,6 +61,9 @@ fi
 
 echo "Загрузка $total_files файлов -> ${HOSTING_PROTOCOL}://${HOSTING_HOST}/${HOSTING_REMOTE_DIR}/"
 
+# Обновляем mtime всех файлов, чтобы lftp всегда считал их новее серверных
+find "$BUILD_DIR" -type f -exec touch {} \;
+
 if command -v lftp >/dev/null 2>&1; then
   lftp_ssl_force="false"
   if [[ "$HOSTING_PROTOCOL" == "ftps" ]]; then

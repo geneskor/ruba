@@ -12,6 +12,12 @@
     if (nextInput && window.location && window.location.origin) {
       nextInput.value = new URL(nextInput.value, window.location.origin).toString();
     }
+
+    form.addEventListener('submit', () => {
+      if (typeof ym === 'function') {
+        ym(108985083, 'reachGoal', 'lead');
+      }
+    });
   });
 
   const formatPhone = (value) => {

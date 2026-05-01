@@ -1,5 +1,16 @@
 ---
-const { title = 'FAQ', items = [], className = '' } = Astro.props;
+type FaqItem = {
+  question: string;
+  answer: string;
+};
+
+interface Props {
+  title?: string;
+  items?: FaqItem[];
+  className?: string;
+}
+
+const { title = 'FAQ', items = [], className = '' } = Astro.props as Props;
 const sectionClass = className?.trim() ? className : 'mt-10';
 ---
 
@@ -12,16 +23,16 @@ const sectionClass = className?.trim() ? className : 'mt-10';
   </div>
 
   <div class="mt-5 space-y-3">
-    {items.map((item) => (
+    {items.map((item: FaqItem) => (
       <details class="faq-item rounded-2xl border border-[var(--brand-accent-border)] bg-white/90 px-5 py-4 shadow-[0_12px_24px_rgba(15,10,5,0.06)] transition hover:-translate-y-0.5 hover:shadow-[0_18px_30px_rgba(15,10,5,0.12)]">
         <summary class="flex cursor-pointer items-center justify-between gap-4 text-base font-semibold text-gray-900">
-          <span set:html={item.question}></span>
+          <span>{item.question}</span>
           <span class="faq-icon grid h-8 w-8 shrink-0 aspect-square place-items-center rounded-full border border-[var(--brand-accent-border)] text-[var(--brand-accent)]">
             +
           </span>
         </summary>
         <div class="faq-content">
-          <p class="pt-3 text-sm text-gray-600" set:html={item.answer}></p>
+          <p class="pt-3 text-sm text-gray-600">{item.answer}</p>
         </div>
       </details>
     ))}

@@ -1,5 +1,6 @@
 ---
 import OptimizedImage from './OptimizedImage.astro';
+import { CONTACT_PHONE_DISPLAY, CONTACT_PHONE_E164 } from '../consts/site';
 
 const pathnameRaw = Astro.url?.pathname ?? '/';
 const normalize = (path: string) =>
@@ -32,10 +33,13 @@ const linkClassMobile = (href: string) =>
       ? 'bg-[var(--brand-accent-soft)] text-[#0b1f2a]'
       : 'text-gray-700 hover:bg-[var(--brand-accent-soft)] hover:text-[#0b1f2a]'
   }`;
+
+const phoneClass =
+  'inline-flex items-center rounded-full border border-white/45 bg-[#0b1f2a]/20 px-3 py-2 text-[0.62rem] font-semibold tracking-[0.02em] text-white shadow-sm backdrop-blur transition hover:bg-[#0b1f2a]/35 whitespace-nowrap sm:text-xs';
 ---
 
 <header class="fixed left-0 top-0 z-50 w-full bg-[#4ebcc6] shadow-md">
-  <div class="mx-auto flex max-w-6xl items-center justify-between px-6 py-3">
+  <div class="mx-auto flex max-w-6xl items-center justify-between gap-3 px-3 py-3 sm:px-6">
     <a class="flex flex-col items-center ml-0 sm:-ml-8" href="/">
       <OptimizedImage
         src="/images/ava.png"
@@ -50,50 +54,56 @@ const linkClassMobile = (href: string) =>
       </span>
     </a>
 
-    <nav class="hidden items-center gap-3 text-sm md:flex">
-      {navItems.map((item) => (
-        <a
-          href={item.href}
-          aria-current={isActive(item.href) ? 'page' : undefined}
-          class={linkClass(item.href)}
-        >
-          {item.label}
-        </a>
-      ))}
-    </nav>
+    <div class="flex items-center gap-2 sm:gap-3">
+      <nav class="hidden items-center gap-3 text-sm md:flex">
+        {navItems.map((item) => (
+          <a
+            href={item.href}
+            aria-current={isActive(item.href) ? 'page' : undefined}
+            class={linkClass(item.href)}
+          >
+            {item.label}
+          </a>
+        ))}
+      </nav>
 
-    <details class="relative md:hidden">
-      <summary class="cursor-pointer list-none rounded-full border border-white/40 px-4 py-2 text-xs font-semibold uppercase tracking-[0.26em] text-white">
-        <span class="sr-only">Открыть меню</span>
-        <svg
-          class="h-5 w-5"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          aria-hidden="true"
-        >
-          <line x1="3" y1="6" x2="21" y2="6" />
-          <line x1="3" y1="12" x2="21" y2="12" />
-          <line x1="3" y1="18" x2="21" y2="18" />
-        </svg>
-      </summary>
+      <a class={phoneClass} href={`tel:${CONTACT_PHONE_E164}`} aria-label={`Позвонить: ${CONTACT_PHONE_DISPLAY}`}>
+        {CONTACT_PHONE_DISPLAY}
+      </a>
 
-      <div class="absolute right-0 mt-3 w-64 rounded-2xl border border-[var(--brand-accent-border)] bg-white/95 p-3 shadow-[0_16px_32px_rgba(15,10,5,0.12)] backdrop-blur">
-        <nav class="grid gap-2 text-sm">
-          {navItems.map((item) => (
-            <a
-              href={item.href}
-              aria-current={isActive(item.href) ? 'page' : undefined}
-              class={linkClassMobile(item.href)}
-            >
-              {item.label}
-            </a>
-          ))}
-        </nav>
-      </div>
-    </details>
+      <details class="relative md:hidden">
+        <summary class="cursor-pointer list-none rounded-full border border-white/40 px-4 py-2 text-xs font-semibold uppercase tracking-[0.26em] text-white">
+          <span class="sr-only">Открыть меню</span>
+          <svg
+            class="h-5 w-5"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <line x1="3" y1="6" x2="21" y2="6" />
+            <line x1="3" y1="12" x2="21" y2="12" />
+            <line x1="3" y1="18" x2="21" y2="18" />
+          </svg>
+        </summary>
+
+        <div class="absolute right-0 mt-3 w-64 rounded-2xl border border-[var(--brand-accent-border)] bg-white/95 p-3 shadow-[0_16px_32px_rgba(15,10,5,0.12)] backdrop-blur">
+          <nav class="grid gap-2 text-sm">
+            {navItems.map((item) => (
+              <a
+                href={item.href}
+                aria-current={isActive(item.href) ? 'page' : undefined}
+                class={linkClassMobile(item.href)}
+              >
+                {item.label}
+              </a>
+            ))}
+          </nav>
+        </div>
+      </details>
+    </div>
   </div>
 </header>

@@ -80,7 +80,7 @@ const galleryImages: string[] = (() => {
 const hasGallery = galleryImages.length > 1;
 ---
 
-<BaseLayout title={seoTitle} description={seoDescription} hero flushBottom>
+<BaseLayout title={seoTitle} description={seoDescription} hero flushBottom ogType="product">
   <CanonicalLink slot="head" />
   <BreadcrumbJsonLd slot="head" items={breadcrumbItems} />
   <ProductJsonLd slot="head" product={product} categoryTitle={categoryTitle} url={canonicalUrl} />

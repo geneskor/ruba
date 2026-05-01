@@ -8,6 +8,8 @@
 - `src/data/` — локальные данные (например, `products.json`, `categories.json`, `fish.json`, `catalog/ryba.json`, `blog.json`, `delivery.json`, `product-faq.json`).
 - `src/styles/` — глобальные стили (`global.css` подключает Tailwind).
 - `src/assets/` — ассеты, которые бандлятся; `public/` — статика как есть (например, `public/favicon.svg`).
+- `scripts/` — служебные shell-скрипты (`optimize-videos.sh`, `setup-vps.sh`, `deploy-vps.sh`, `check-domain.sh`).
+- `deploy/nginx/` — пример конфигурации nginx для прод-сервера.
 - Конфиги: `astro.config.mjs`, `tsconfig.json`; сборка попадает в `dist/`.
 
 ## Сборка, тесты и разработка
@@ -17,6 +19,9 @@
 - `npm run build` — продакшн-сборка в `dist/`.
 - `npm run preview` — локальный предпросмотр сборки.
 - `npm run astro -- --help` — справка по CLI Astro.
+- `npm run setup:vps` — первичная настройка VPS (nginx + certbot).
+- `npm run deploy:vps` — сборка и публикация `dist/` на VPS по SSH/rsync.
+- `npm run check:domain` — быстрая проверка DNS и HTTP/HTTPS после деплоя.
 
 ## Стиль кода и именование
 - Отступы: 2 пробела в `.astro` файлах.

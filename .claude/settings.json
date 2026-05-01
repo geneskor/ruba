@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "defaultMode": "bypassPermissions",
+    "allow": [
+      "Bash(chmod *)",
+      "Bash(mkdir *)",
+      "Bash(npm ci)",
+      "Bash(npm run dev)",
+      "Bash(npm run build)",
+      "Bash(npm run preview)",
+      "Bash(npm run setup:directus)",
+      "Bash(npm run setup:vps)",
+      "Bash(npm run deploy:vps)",
+      "Bash(npm run sync:sheet)",
+      "Bash(npm run check:domain)",
+      "Bash(openssl rand *)"
+    ]
+  }
+}

@@ -1,2 +1,3 @@
 User-agent: *
 Allow: /
+Sitemap: https://rybasvprud.ru/sitemap.xml

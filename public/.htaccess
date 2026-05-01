@@ -1,0 +1,23 @@
+RewriteEngine On
+
+# Serve custom 404 page from the built static file.
+ErrorDocument 404 /404.html
+
+# Legacy catalog URLs: permanent redirects to new /ryba/* paths.
+RewriteRule ^catalog/ryba/?$ https://rybasvprud.ru/ryba/ [R=301,L]
+RewriteRule ^catalog/ryba/([^/]+)/([^/]+)/?$ https://rybasvprud.ru/ryba/$1/$2/ [R=301,L]
+RewriteRule ^catalog/ryba/([^/]+)/?$ https://rybasvprud.ru/ryba/$1/ [R=301,L]
+
+# Redirect www to the canonical bare domain.
+RewriteCond %{HTTP_HOST} ^www\.rybasvprud\.ru$ [NC]
+RewriteRule ^ https://rybasvprud.ru%{REQUEST_URI} [R=301,L]
+
+# Force HTTPS for all non-secure requests.
+RewriteCond %{HTTPS} !=on
+RewriteCond %{HTTP:X-Forwarded-Proto} !https
+RewriteRule ^ https://rybasvprud.ru%{REQUEST_URI} [R=301,L]
+
+# Normalize route URLs to trailing slash and stay on canonical HTTPS host.
+RewriteCond %{REQUEST_URI} !/$
+RewriteCond %{REQUEST_URI} !\.[a-zA-Z0-9]{1,6}$
+RewriteRule ^(.+)$ https://rybasvprud.ru/$1/ [R=301,L]

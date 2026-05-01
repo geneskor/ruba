@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import { CONTACT_EMAIL } from '../consts/site';
+import CanonicalLink from '../components/CanonicalLink.astro';
+import { CONTACT_EMAIL, CONTACT_PHONE_DISPLAY, CONTACT_PHONE_E164 } from '../consts/site';
 
 const YANDEX_MAP_LAT = 55.859353;
 const YANDEX_MAP_LON = 37.182640;
@@ -10,10 +11,11 @@ const YANDEX_MAP_LINK = `https://yandex.ru/maps/?ll=${YANDEX_MAP_LON}%2C${YANDEX
 ---
 
 <BaseLayout
-  title="Контакты"
-  description="Поможем с подбором рыбы и кормов, рассчитаем объём и согласуем доставку."
+  title="Контакты — Рыба для зарыбления пруда | Рыба здесь - есть!"
+  description="Контакты для заказа рыбы и консультации по зарыблению пруда: телефон, email, адрес в Нахабино и схема проезда."
   hero
 >
+  <CanonicalLink slot="head" />
   <section
     slot="hero"
     class="relative overflow-hidden bg-[linear-gradient(135deg,_#0b1f2a_0%,_#123247_55%,_#07131b_100%)] text-white"
@@ -66,8 +68,8 @@ const YANDEX_MAP_LINK = `https://yandex.ru/maps/?ll=${YANDEX_MAP_LON}%2C${YANDEX
 
           <a
             class="contact-card focus-ring block border border-[var(--brand-accent-border)] bg-white/90 p-6 text-center transition hover:-translate-y-1 hover:shadow-[0_22px_46px_rgba(15,10,5,0.16)]"
-            href="tel:+79993380337"
-            aria-label="+7 (999) 338-0-337"
+            href={`tel:${CONTACT_PHONE_E164}`}
+            aria-label={CONTACT_PHONE_DISPLAY}
           >
             <div class="mx-auto grid h-14 w-14 place-items-center rounded-full text-[var(--color-primary)]" aria-hidden="true">
               <svg viewBox="0 0 24 24" role="img" aria-hidden="true">
@@ -84,7 +86,7 @@ const YANDEX_MAP_LINK = `https://yandex.ru/maps/?ll=${YANDEX_MAP_LON}%2C${YANDEX
               ТЕЛЕФОН
             </h2>
             <p class="mt-3 text-lg font-semibold text-[var(--color-primary)] transition hover:text-[var(--color-primary-dark)]">
-              +7 (999) 338-0-337
+              {CONTACT_PHONE_DISPLAY}
             </p>
           </a>
 

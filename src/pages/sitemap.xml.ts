@@ -1,33 +1,47 @@
 import ryba from '../data/catalog/ryba.json';
 import blog from '../data/blog.json';
 
-const SITE = 'https://example.com';
+const SITE = import.meta.env.SITE || 'https://rybasvprud.ru';
 
-const staticRoutes = [
-  '/',
-  '/contacts/',
-  '/ryba/',
-  '/blog/',
-  '/delivery/'
+type SitemapEntry = {
+  path: string;
+  lastmod?: string;
+};
+
+const staticRoutes: SitemapEntry[] = [
+  { path: '/' },
+  { path: '/contacts/' },
+  { path: '/ryba/' },
+  { path: '/blog/' },
+  { path: '/delivery/' }
 ];
 
-const categoryRoutes = [
-  ...ryba.categories.map((category) => `/ryba/${category.slug}/`)
+const categoryRoutes: SitemapEntry[] = [
+  ...ryba.categories.map((category) => ({ path: `/ryba/${category.slug}/` }))
 ];
 
-const productRoutes = [
-  ...ryba.products.map(
-    (product) => `/ryba/${product.category}/${product.slug}/`
-  )
+const productRoutes: SitemapEntry[] = [
+  ...ryba.products.map((product) => ({
+    path: `/ryba/${product.category}/${product.slug}/`
+  }))
 ];
 
-const blogRoutes = blog.posts.map((post) => `/blog/${post.slug}/`);
+const blogRoutes: SitemapEntry[] = blog.posts.map((post) => ({
+  path: `/blog/${post.slug}/`,
+  lastmod: post.date
+}));
 
 const urls = [...staticRoutes, ...categoryRoutes, ...productRoutes, ...blogRoutes];
 
 const body = `<?xml version="1.0" encoding="UTF-8"?>\n` +
   `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n` +
-  urls.map((path) => `  <url><loc>${new URL(path, SITE).toString()}</loc></url>`).join('\n') +
+  urls
+    .map(({ path, lastmod }) => {
+      const loc = new URL(path, SITE).toString();
+      const lastmodTag = lastmod ? `<lastmod>${lastmod}</lastmod>` : '';
+      return `  <url><loc>${loc}</loc>${lastmodTag}</url>`;
+    })
+    .join('\n') +
   `\n</urlset>`;
 
 export function GET() {

@@ -1,5 +1,23 @@
 ---
-const { category, href, items = [], compact = false } = Astro.props;
+type Category = {
+  title: string;
+  description?: string;
+};
+
+type CategoryItem = {
+  name: string;
+  category: string;
+  slug: string;
+};
+
+interface Props {
+  category: Category;
+  href: string;
+  items?: CategoryItem[];
+  compact?: boolean;
+}
+
+const { category, href, items = [], compact = false } = Astro.props as Props;
 const previewItems = items.slice(0, compact ? 2 : 3);
 const hasItems = items.length > 0;
 const countLabel = hasItems ? `${items.length} позиций` : 'Нет позиций';
@@ -50,7 +68,7 @@ const linkClass = compact
     <div
       class={`${compact ? 'mt-3 flex flex-wrap gap-2' : 'mt-4 flex flex-wrap gap-2'} relative z-10 pointer-events-auto`}
     >
-      {previewItems.map((item) => (
+      {previewItems.map((item: CategoryItem) => (
         <a class={chipClass} href={`/ryba/${item.category}/${item.slug}/`}>
           {item.name}
         </a>

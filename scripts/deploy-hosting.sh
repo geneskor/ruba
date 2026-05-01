@@ -74,7 +74,7 @@ if command -v lftp >/dev/null 2>&1; then
     set net:reconnect-interval-base 5; \
     set ftp:passive-mode true; \
     set ftp:ssl-force ${lftp_ssl_force}; \
-    mirror -R --delete --verbose=1 \"${BUILD_DIR}\" \"${HOSTING_REMOTE_DIR}\"; \
+    mirror -R --delete --overwrite --verbose=1 \"${BUILD_DIR}\" \"${HOSTING_REMOTE_DIR}\"; \
     bye"
 else
   cd "$BUILD_DIR"

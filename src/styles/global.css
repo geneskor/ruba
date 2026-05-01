@@ -8,7 +8,7 @@
   --brand-accent-border: rgba(79, 188, 198, 0.45);
   --brand-ink: #1c1209;
   --font-display: "Montserrat", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
-  --font-body: "PT Serif", "Georgia", "Times New Roman", serif;
+  --font-body: system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
 }
 
 .logo-tagline {

@@ -7,6 +7,17 @@
   const phoneInputs = document.querySelectorAll('.lead-form input[name="phone"]');
   const leadForms = document.querySelectorAll(".lead-form form");
 
+  document.querySelectorAll('.messenger-link').forEach((link) => {
+    link.addEventListener('click', () => {
+      if (typeof ym !== 'function') return;
+      const href = link.getAttribute('href') ?? '';
+      if (href.startsWith('tel:')) ym(108985083, 'reachGoal', 'phone_click');
+      else if (href.includes('wa.me') || href.includes('whatsapp')) ym(108985083, 'reachGoal', 'whatsapp_click');
+      else if (href.includes('t.me') || href.includes('telegram')) ym(108985083, 'reachGoal', 'telegram_click');
+      else ym(108985083, 'reachGoal', 'messenger_click');
+    });
+  });
+
   leadForms.forEach((form) => {
     const nextInput = form.querySelector('input[name="_next"]');
     if (nextInput && window.location && window.location.origin) {

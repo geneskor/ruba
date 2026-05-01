@@ -1,5 +1,4 @@
-import ryba from '../data/catalog/ryba.json';
-import blog from '../data/blog.json';
+import { getCatalog, getBlog } from '../lib/directus';
 
 const SITE = import.meta.env.SITE || 'https://rybasvprud.ru';
 
@@ -8,46 +7,45 @@ type SitemapEntry = {
   lastmod?: string;
 };
 
-const staticRoutes: SitemapEntry[] = [
-  { path: '/' },
-  { path: '/contacts/' },
-  { path: '/ryba/' },
-  { path: '/blog/' },
-  { path: '/delivery/' }
-];
+export async function GET() {
+  const [ryba, blog] = await Promise.all([getCatalog(), getBlog()]);
 
-const categoryRoutes: SitemapEntry[] = [
-  ...ryba.categories.map((category) => ({ path: `/ryba/${category.slug}/` }))
-];
+  const staticRoutes: SitemapEntry[] = [
+    { path: '/' },
+    { path: '/contacts/' },
+    { path: '/ryba/' },
+    { path: '/blog/' },
+    { path: '/delivery/' }
+  ];
 
-const productRoutes: SitemapEntry[] = [
-  ...ryba.products.map((product) => ({
+  const categoryRoutes: SitemapEntry[] = ryba.categories.map((category) => ({
+    path: `/ryba/${category.slug}/`
+  }));
+
+  const productRoutes: SitemapEntry[] = ryba.products.map((product) => ({
     path: `/ryba/${product.category}/${product.slug}/`
-  }))
-];
+  }));
 
-const blogRoutes: SitemapEntry[] = blog.posts.map((post) => ({
-  path: `/blog/${post.slug}/`,
-  lastmod: post.date
-}));
+  const blogRoutes: SitemapEntry[] = blog.posts.map((post) => ({
+    path: `/blog/${post.slug}/`,
+    lastmod: post.date
+  }));
 
-const urls = [...staticRoutes, ...categoryRoutes, ...productRoutes, ...blogRoutes];
+  const urls = [...staticRoutes, ...categoryRoutes, ...productRoutes, ...blogRoutes];
 
-const body = `<?xml version="1.0" encoding="UTF-8"?>\n` +
-  `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n` +
-  urls
-    .map(({ path, lastmod }) => {
-      const loc = new URL(path, SITE).toString();
-      const lastmodTag = lastmod ? `<lastmod>${lastmod}</lastmod>` : '';
-      return `  <url><loc>${loc}</loc>${lastmodTag}</url>`;
-    })
-    .join('\n') +
-  `\n</urlset>`;
+  const body =
+    `<?xml version="1.0" encoding="UTF-8"?>\n` +
+    `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n` +
+    urls
+      .map(({ path, lastmod }) => {
+        const loc = new URL(path, SITE).toString();
+        const lastmodTag = lastmod ? `<lastmod>${lastmod}</lastmod>` : '';
+        return `  <url><loc>${loc}</loc>${lastmodTag}</url>`;
+      })
+      .join('\n') +
+    `\n</urlset>`;
 
-export function GET() {
   return new Response(body, {
-    headers: {
-      'Content-Type': 'application/xml; charset=utf-8'
-    }
+    headers: { 'Content-Type': 'application/xml; charset=utf-8' }
   });
 }

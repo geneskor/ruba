@@ -61,25 +61,8 @@ fi
 
 echo "Загрузка $total_files файлов -> ${HOSTING_PROTOCOL}://${HOSTING_HOST}/${HOSTING_REMOTE_DIR}/"
 
-# Обновляем mtime всех файлов, чтобы lftp всегда считал их новее серверных
-find "$BUILD_DIR" -type f -exec touch {} \;
-
-if command -v lftp >/dev/null 2>&1; then
-  lftp_ssl_force="false"
-  if [[ "$HOSTING_PROTOCOL" == "ftps" ]]; then
-    lftp_ssl_force="true"
-  fi
-
-  lftp -u "$HOSTING_USER","$HOSTING_PASSWORD" "${HOSTING_PROTOCOL}://${HOSTING_HOST}" -e "\
-    set cmd:fail-exit true; \
-    set net:max-retries 5; \
-    set net:timeout 20; \
-    set net:reconnect-interval-base 5; \
-    set ftp:passive-mode true; \
-    set ftp:ssl-force ${lftp_ssl_force}; \
-    mirror -R --delete --overwrite --verbose=1 \"${BUILD_DIR}\" \"${HOSTING_REMOTE_DIR}\"; \
-    bye"
-else
+if false; then
+  : # lftp mirror пропускает файлы с одинаковым размером — используем curl
   cd "$BUILD_DIR"
 
   count=0

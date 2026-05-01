@@ -15,7 +15,8 @@ export async function GET() {
     { path: '/contacts/' },
     { path: '/ryba/' },
     { path: '/blog/' },
-    { path: '/delivery/' }
+    { path: '/delivery/' },
+    { path: '/privacy/' }
   ];
 
   const categoryRoutes: SitemapEntry[] = ryba.categories.map((category) => ({

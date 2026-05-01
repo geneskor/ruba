@@ -1,0 +1,114 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import CanonicalLink from '../components/CanonicalLink.astro';
+import {
+  BUSINESS_NAME,
+  CONTACT_EMAIL,
+  CONTACT_PHONE_DISPLAY,
+  CONTACT_ADDRESS_LINE
+} from '../consts/site';
+
+const title = 'Политика конфиденциальности';
+const description = 'Политика обработки персональных данных на сайте rybasvprud.ru';
+const updated = '01.05.2026';
+---
+
+<BaseLayout title={title} description={description}>
+  <CanonicalLink slot="head" />
+
+  <div class="mx-auto max-w-3xl">
+    <h1 class="text-3xl font-semibold text-gray-900">{title}</h1>
+    <p class="mt-2 text-sm text-gray-400">Последнее обновление: {updated}</p>
+
+    <div class="mt-8 space-y-8 text-base text-gray-700 leading-relaxed">
+
+      <section>
+        <h2 class="text-xl font-semibold text-gray-900 mb-3">1. Общие положения</h2>
+        <p>
+          Настоящая политика конфиденциальности описывает порядок обработки персональных данных
+          пользователей сайта <strong>rybasvprud.ru</strong>, принадлежащего <strong>{BUSINESS_NAME}</strong>.
+        </p>
+        <p class="mt-3">
+          Используя сайт и отправляя формы обратной связи, вы соглашаетесь с условиями настоящей политики.
+          Если вы не согласны — пожалуйста, не используйте форму и свяжитесь с нами напрямую по телефону
+          или электронной почте.
+        </p>
+      </section>
+
+      <section>
+        <h2 class="text-xl font-semibold text-gray-900 mb-3">2. Какие данные мы собираем</h2>
+        <p>При заполнении формы на сайте мы получаем:</p>
+        <ul class="mt-2 list-disc pl-6 space-y-1">
+          <li>Имя</li>
+          <li>Номер телефона</li>
+          <li>Комментарий (необязательно)</li>
+          <li>Адрес страницы, с которой отправлена форма</li>
+        </ul>
+        <p class="mt-3">Мы не собираем платёжные данные, паспортные данные и иные чувствительные сведения.</p>
+      </section>
+
+      <section>
+        <h2 class="text-xl font-semibold text-gray-900 mb-3">3. Как мы используем данные</h2>
+        <p>Полученные данные используются исключительно для:</p>
+        <ul class="mt-2 list-disc pl-6 space-y-1">
+          <li>Обратной связи по вашему запросу</li>
+          <li>Уточнения деталей заказа или консультации</li>
+        </ul>
+        <p class="mt-3">Мы не продаём и не передаём ваши данные третьим лицам в маркетинговых целях.</p>
+      </section>
+
+      <section>
+        <h2 class="text-xl font-semibold text-gray-900 mb-3">4. Передача данных третьим лицам</h2>
+        <p>
+          Для доставки формы используется сервис <strong>FormSubmit</strong> (formsubmit.co) —
+          он передаёт данные на наш e-mail. Сервис не хранит данные постоянно.
+        </p>
+        <p class="mt-3">
+          На сайте установлен счётчик <strong>Яндекс.Метрика</strong>, который собирает
+          обезличенную статистику посещений (браузер, устройство, страницы). Персональные данные
+          из формы в Метрику не передаются.
+        </p>
+      </section>
+
+      <section>
+        <h2 class="text-xl font-semibold text-gray-900 mb-3">5. Хранение данных</h2>
+        <p>
+          Данные из форм хранятся в виде писем на нашей электронной почте и удаляются
+          по истечении необходимости или по вашему запросу.
+        </p>
+      </section>
+
+      <section>
+        <h2 class="text-xl font-semibold text-gray-900 mb-3">6. Ваши права</h2>
+        <p>В соответствии с Федеральным законом № 152-ФЗ «О персональных данных» вы вправе:</p>
+        <ul class="mt-2 list-disc pl-6 space-y-1">
+          <li>Запросить информацию о хранимых данных</li>
+          <li>Потребовать исправления или удаления ваших данных</li>
+          <li>Отозвать согласие на обработку</li>
+        </ul>
+        <p class="mt-3">Для реализации этих прав свяжитесь с нами по контактам ниже.</p>
+      </section>
+
+      <section>
+        <h2 class="text-xl font-semibold text-gray-900 mb-3">7. Контакты</h2>
+        <ul class="space-y-1">
+          <li><strong>Организация:</strong> {BUSINESS_NAME}</li>
+          <li><strong>Адрес:</strong> {CONTACT_ADDRESS_LINE}</li>
+          <li>
+            <strong>Телефон:</strong>{' '}
+            <a class="text-[var(--brand-accent)] hover:underline" href={`tel:${CONTACT_PHONE_DISPLAY.replace(/\s/g,'')}`}>
+              {CONTACT_PHONE_DISPLAY}
+            </a>
+          </li>
+          <li>
+            <strong>E-mail:</strong>{' '}
+            <a class="text-[var(--brand-accent)] hover:underline" href={`mailto:${CONTACT_EMAIL}`}>
+              {CONTACT_EMAIL}
+            </a>
+          </li>
+        </ul>
+      </section>
+
+    </div>
+  </div>
+</BaseLayout>

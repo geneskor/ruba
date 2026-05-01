@@ -3,6 +3,7 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
 import CanonicalLink from '../../../components/CanonicalLink.astro';
 import BreadcrumbJsonLd from '../../../components/BreadcrumbJsonLd.astro';
 import ProductJsonLd from '../../../components/ProductJsonLd.astro';
+import FaqJsonLd from '../../../components/FaqJsonLd.astro';
 import LeadForm from '../../../components/LeadForm.astro';
 import FaqList from '../../../components/FaqList.astro';
 import RelatedProducts from '../../../components/RelatedProducts.astro';
@@ -83,6 +84,7 @@ const hasGallery = galleryImages.length > 1;
   <CanonicalLink slot="head" />
   <BreadcrumbJsonLd slot="head" items={breadcrumbItems} />
   <ProductJsonLd slot="head" product={product} categoryTitle={categoryTitle} url={canonicalUrl} />
+  <FaqJsonLd slot="head" items={faqItems} />
 
   <div class="-mx-6 bg-gradient-to-t from-[var(--brand-accent-soft-2)] via-[var(--brand-accent-soft)] to-white">
     <section class="relative overflow-hidden bg-transparent">

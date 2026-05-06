@@ -5,21 +5,25 @@
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
-    "preview": "astro preview",
+    "preview": "npm run build && wrangler dev",
     "astro": "astro",
     "optimize:videos": "./scripts/optimize-videos.sh",
     "setup:vps": "./scripts/setup-vps.sh",
     "deploy:vps": "./scripts/deploy-vps.sh",
     "deploy:hosting": "./scripts/deploy-hosting.sh",
     "check:domain": "./scripts/check-domain.sh",
-    "setup:directus": "./scripts/setup-directus.sh"
+    "setup:directus": "./scripts/setup-directus.sh",
+    "deploy": "npm run build && wrangler deploy",
+    "cf-typegen": "wrangler types"
   },
   "dependencies": {
+    "@astrojs/cloudflare": "12",
     "@tailwindcss/vite": "^4.1.18",
     "astro": "^5.16.11",
     "tailwindcss": "^4.1.18"
   },
   "devDependencies": {
-    "@types/node": "^25.6.0"
+    "@types/node": "^25.6.0",
+    "wrangler": "^4.88.0"
   }
 }

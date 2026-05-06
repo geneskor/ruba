@@ -118,6 +118,7 @@ const subject = productName
       <input type="hidden" name="_subject" value={subject} />
       <input type="hidden" name="_captcha" value="false" />
       <input type="hidden" name="_next" value={thankYouPath} />
+      <input type="hidden" name="_webhook" value="https://admin.rybasvprud.ru/tg" />
       <input type="hidden" name="source" value={formSource} />
       {productName ? <input type="hidden" name="product" value={productName} /> : null}
       <input type="text" name="_honey" class="hidden" tabindex="-1" autocomplete="off" />

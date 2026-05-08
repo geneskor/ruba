@@ -1,0 +1,33 @@
+name: Telegram Notify
+
+on:
+  repository_dispatch:
+    types: [lead-form]
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send Telegram message
+        env:
+          BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          NAME: ${{ github.event.client_payload.name }}
+          PHONE: ${{ github.event.client_payload.phone }}
+          COMMENT: ${{ github.event.client_payload.comment }}
+          PRODUCT: ${{ github.event.client_payload.product }}
+          SOURCE: ${{ github.event.client_payload.source }}
+        run: |
+          TEXT="📬 <b>Новая заявка с сайта</b>%0A"
+          TEXT="${TEXT}👤 <b>Имя:</b> ${NAME}%0A"
+          TEXT="${TEXT}📞 <b>Телефон:</b> ${PHONE}"
+          if [ -n "$PRODUCT" ]; then
+            TEXT="${TEXT}%0A🐟 <b>Товар:</b> ${PRODUCT}"
+          fi
+          if [ -n "$COMMENT" ]; then
+            TEXT="${TEXT}%0A💬 <b>Комментарий:</b> ${COMMENT}"
+          fi
+          TEXT="${TEXT}%0A🔗 <b>Страница:</b> ${SOURCE}"
+
+          curl -s -X POST "https://api.telegram.org/bot${BOT_TOKEN}/sendMessage" \
+            -d "chat_id=${CHAT_ID}&parse_mode=HTML&text=${TEXT}"

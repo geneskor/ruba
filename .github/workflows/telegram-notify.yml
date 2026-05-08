@@ -29,5 +29,13 @@ jobs:
           fi
           TEXT="${TEXT}%0A🔗 <b>Страница:</b> ${SOURCE}"
 
+          # Очистим номер телефона: оставим только цифры и +
+          PHONE_CLEAN=$(echo "$PHONE" | tr -cd '+0-9')
+
+          # Inline-кнопки: Позвонить + WhatsApp
+          KEYBOARD=$(printf '{"inline_keyboard":[[{"text":"📞 Позвонить","url":"tel:%s"},{"text":"💬 WhatsApp","url":"https://wa.me/%s"}]]}' \
+            "$PHONE_CLEAN" "${PHONE_CLEAN#+}")
+
           curl -s -X POST "https://api.telegram.org/bot${BOT_TOKEN}/sendMessage" \
-            -d "chat_id=${CHAT_ID}&parse_mode=HTML&text=${TEXT}"
+            -H "Content-Type: application/json" \
+            -d "{\"chat_id\":\"${CHAT_ID}\",\"parse_mode\":\"HTML\",\"text\":\"${TEXT}\",\"reply_markup\":$(echo $KEYBOARD)}"

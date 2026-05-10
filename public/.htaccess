@@ -1,6 +1,10 @@
-# Cache static assets for 1 year (immutable — Astro hashes filenames on build).
+# Register AVIF MIME type (some shared hosts don't have it by default).
+AddType image/avif .avif
+
+# Cache static assets for 1 year.
 <IfModule mod_expires.c>
   ExpiresActive On
+  ExpiresByType image/avif "access plus 1 year"
   ExpiresByType image/webp "access plus 1 year"
   ExpiresByType image/png "access plus 1 year"
   ExpiresByType image/svg+xml "access plus 1 year"
@@ -12,7 +16,7 @@
 </IfModule>
 
 <IfModule mod_headers.c>
-  <FilesMatch "\.(webp|png|svg|ico|jpg|jpeg|woff2)$">
+  <FilesMatch "\.(avif|webp|png|svg|ico|jpg|jpeg|woff2)$">
     Header set Cache-Control "public, max-age=31536000, immutable"
   </FilesMatch>
   <FilesMatch "\.(css|js)$">

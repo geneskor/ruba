@@ -182,54 +182,57 @@ const organizationJsonLd = {
       </button>
     </div>
 
-    <!-- Backdrop -->
-    <div id="contact-backdrop" style="display:none;position:fixed;inset:0;z-index:65;background:rgba(0,0,0,0.55);backdrop-filter:blur(2px);"></div>
+    <!-- Backdrop — mobile only -->
+    <div id="contact-backdrop" style="display:none;position:fixed;inset:0;z-index:65;background:rgba(0,0,0,0.45);backdrop-filter:blur(2px);"></div>
 
-    <!-- Contact widget — bottom sheet -->
+    <!-- Contact widget — bottom sheet on mobile, popup card on desktop -->
     <div id="contact-widget" role="dialog" aria-modal="true" aria-label="Контакты"
-      style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:70;">
-      <div style="background:#fff;border-radius:24px 24px 0 0;padding:1rem 1.2rem 2.2rem;box-shadow:0 -8px 40px rgba(15,10,5,0.13);">
-        <!-- Handle -->
-        <div style="width:36px;height:4px;background:#e2e8f0;border-radius:2px;margin:0 auto 1.2rem;"></div>
+      style="display:none;position:fixed;z-index:70;">
+      <div id="contact-widget-inner" style="background:#fff;padding:1rem 1.2rem 2.2rem;box-shadow:0 -8px 40px rgba(15,10,5,0.13);">
+        <!-- Handle (mobile only, hidden on desktop via CSS) -->
+        <div class="widget-handle" style="width:36px;height:4px;background:#e2e8f0;border-radius:2px;margin:0 auto 1.2rem;"></div>
         <!-- Close -->
         <button id="contact-widget-close" aria-label="Закрыть"
           style="position:absolute;top:1.1rem;right:1.2rem;background:#f1f5f9;border:none;cursor:pointer;color:#64748b;width:2rem;height:2rem;border-radius:50%;font-size:0.85rem;display:flex;align-items:center;justify-content:center;line-height:1;">✕</button>
         <!-- Title -->
-        <p style="text-align:center;color:#0b1f2a;font-size:1.1rem;font-weight:700;margin:0 0 0.25rem;">Напишите нам</p>
-        <p style="text-align:center;color:#64748b;font-size:0.78rem;margin:0 0 1.4rem;">Ответим в ближайшее время</p>
+        <p style="text-align:center;color:#0b1f2a;font-size:1.05rem;font-weight:700;margin:0 0 0.2rem;">Напишите нам</p>
+        <p style="text-align:center;color:#64748b;font-size:0.75rem;margin:0 0 1.2rem;">Ответим в ближайшее время</p>
         <!-- Messenger buttons -->
-        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:0.75rem;margin-bottom:1rem;">
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:0.65rem;margin-bottom:0.9rem;">
           <a href={CONTACT_WHATSAPP_URL} target="_blank" rel="noreferrer noopener"
-            style="display:flex;flex-direction:column;align-items:center;gap:0.55rem;padding:1.1rem 0.5rem;border-radius:18px;background:linear-gradient(145deg,#25d366,#128c7e);color:#fff;text-decoration:none;font-size:0.75rem;font-weight:700;box-shadow:0 6px 16px rgba(37,211,102,0.3);">
-            <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            style="display:flex;flex-direction:column;align-items:center;gap:0.5rem;padding:1rem 0.4rem;border-radius:16px;background:linear-gradient(145deg,#25d366,#128c7e);color:#fff;text-decoration:none;font-size:0.72rem;font-weight:700;box-shadow:0 6px 16px rgba(37,211,102,0.3);">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
               <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
               <path d="M12 2C6.477 2 2 6.477 2 12c0 1.89.525 3.66 1.438 5.168L2 22l4.985-1.407A9.953 9.953 0 0 0 12 22c5.523 0 10-4.477 10-10S17.523 2 12 2zm0 18a7.946 7.946 0 0 1-4.274-1.243l-.306-.183-3.167.894.878-3.082-.2-.316A7.946 7.946 0 0 1 4 12c0-4.411 3.589-8 8-8s8 3.589 8 8-3.589 8-8 8z"/>
             </svg>
             WhatsApp
           </a>
           <a href={CONTACT_TELEGRAM_URL} target="_blank" rel="noreferrer noopener"
-            style="display:flex;flex-direction:column;align-items:center;gap:0.55rem;padding:1.1rem 0.5rem;border-radius:18px;background:linear-gradient(145deg,#38bdf8,#0284c7);color:#fff;text-decoration:none;font-size:0.75rem;font-weight:700;box-shadow:0 6px 16px rgba(56,189,248,0.3);">
-            <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            style="display:flex;flex-direction:column;align-items:center;gap:0.5rem;padding:1rem 0.4rem;border-radius:16px;background:linear-gradient(145deg,#38bdf8,#0284c7);color:#fff;text-decoration:none;font-size:0.72rem;font-weight:700;box-shadow:0 6px 16px rgba(56,189,248,0.3);">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
               <path d="M20.7 4.2 3.8 10.8c-.8.3-.7 1.5.1 1.7l4.4 1.4 1.6 4.8c.2.7 1.1.8 1.5.3l2.6-3.3 4.3 3.1c.6.4 1.4.1 1.6-.6l2.3-12.4c.1-.9-.8-1.7-1.5-1.3Z"/>
             </svg>
             Telegram
           </a>
           <a href={CONTACT_MAX_URL} target="_blank" rel="noreferrer noopener"
-            style="display:flex;flex-direction:column;align-items:center;gap:0.55rem;padding:1.1rem 0.5rem;border-radius:18px;background:linear-gradient(145deg,#7c5cfc,#4a2daa);color:#fff;text-decoration:none;font-size:0.75rem;font-weight:700;box-shadow:0 6px 16px rgba(124,92,252,0.3);">
-            <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor" fill-rule="evenodd" aria-hidden="true">
+            style="display:flex;flex-direction:column;align-items:center;gap:0.5rem;padding:1rem 0.4rem;border-radius:16px;background:linear-gradient(145deg,#7c5cfc,#4a2daa);color:#fff;text-decoration:none;font-size:0.72rem;font-weight:700;box-shadow:0 6px 16px rgba(124,92,252,0.3);">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor" fill-rule="evenodd" aria-hidden="true">
               <path d="M14.254 3.28a4.301 4.301 0 0 1 4.3 4.302 4.301 4.301 0 0 1-1.993 3.63 6.085 6.085 0 0 1 1.054 3.422 6.085 6.085 0 0 1-6.085 6.085 6.085 6.085 0 0 1-6.085-6.085 6.085 6.085 0 0 1 4.66-5.916 4.301 4.301 0 0 1-.152-1.136 4.301 4.301 0 0 1 4.301-4.301zm0 1.849a2.453 2.453 0 0 0-2.453 2.453 2.453 2.453 0 0 0 2.453 2.453 2.453 2.453 0 0 0 2.453-2.453 2.453 2.453 0 0 0-2.453-2.453zm-2.724 5.268a4.237 4.237 0 0 0-4.237 4.237 4.237 4.237 0 0 0 4.237 4.237 4.237 4.237 0 0 0 4.237-4.237 4.237 4.237 0 0 0-4.237-4.237zm.032 2.54a1.781 1.781 0 1 1 0 3.562 1.781 1.781 0 0 1 0-3.562Z"/>
             </svg>
             MAX
           </a>
         </div>
         <!-- Phone -->
-        <div style="background:#f0f9ff;border:1px solid #bae6fd;border-radius:16px;padding:0.9rem 1.1rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;">
+        <a href={`tel:${CONTACT_PHONE_E164}`}
+          style="display:flex;align-items:center;justify-content:space-between;gap:0.75rem;background:#f0f9ff;border:1px solid #bae6fd;border-radius:14px;padding:0.75rem 1rem;text-decoration:none;">
           <div>
-            <p style="color:#0b1f2a;font-size:0.72rem;font-weight:600;margin:0 0 2px;">Предпочитаете звонить?</p>
-            <p style="color:#64748b;font-size:0.72rem;margin:0;">Набирайте номер</p>
+            <p style="color:#0b1f2a;font-size:0.7rem;font-weight:600;margin:0 0 1px;">Предпочитаете звонить?</p>
+            <p style="color:#0ea5b7;font-size:0.88rem;font-weight:700;margin:0;white-space:nowrap;">{CONTACT_PHONE_DISPLAY}</p>
           </div>
-          <a href={`tel:${CONTACT_PHONE_E164}`} style="color:#0ea5b7;font-size:0.95rem;font-weight:700;text-decoration:none;white-space:nowrap;">{CONTACT_PHONE_DISPLAY}</a>
-        </div>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0ea5b7" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex-shrink:0;">
+            <path d="M5 4h4l2.2 5-2.2 1.2c1.7 3.3 4.1 5.7 7.4 7.4l1.2-2.2 5 2.2v4c-9.4 0-17-7.6-17-17Z"/>
+          </svg>
+        </a>
       </div>
     </div>
 
@@ -260,10 +263,35 @@ const organizationJsonLd = {
         filter: brightness(1.1);
         transform: scale(1.08) rotate(0deg) !important;
       }
-      #contact-widget { transition: transform 0.3s cubic-bezier(0.32,0.72,0,1); transform: translateY(100%); }
+      /* Mobile: full-width bottom sheet */
+      #contact-widget {
+        bottom: 0; left: 0; right: 0;
+        transition: transform 0.3s cubic-bezier(0.32,0.72,0,1);
+        transform: translateY(100%);
+      }
+      #contact-widget-inner { border-radius: 24px 24px 0 0; }
       #contact-widget.widget-visible { transform: translateY(0); }
       #contact-backdrop { transition: opacity 0.3s ease; opacity: 0; }
       #contact-backdrop.backdrop-visible { opacity: 1; }
+
+      /* Desktop: small popup card above the button */
+      @media (min-width: 768px) {
+        #contact-widget {
+          bottom: 5rem; right: 1.5rem;
+          left: auto; width: 280px;
+          transform: scale(0.92) translateY(8px);
+          transform-origin: bottom right;
+          transition: opacity 0.2s ease, transform 0.2s ease;
+          opacity: 0;
+        }
+        #contact-widget-inner { border-radius: 20px; padding-bottom: 1.2rem; box-shadow: 0 8px 40px rgba(15,10,5,0.16); }
+        #contact-widget.widget-visible {
+          transform: scale(1) translateY(0);
+          opacity: 1;
+        }
+        .widget-handle { display: none; }
+        #contact-backdrop { display: none !important; }
+      }
     </style>
     <script is:inline>
       (function () {
@@ -283,18 +311,20 @@ const organizationJsonLd = {
         var widget = document.getElementById('contact-widget');
         var backdrop = document.getElementById('contact-backdrop');
         var closeBtn = document.getElementById('contact-widget-close');
+        var isDesktop = function () { return window.innerWidth >= 768; };
         function openWidget() {
           widget.style.display = 'block';
-          backdrop.style.display = 'block';
-          setTimeout(function () {
-            widget.classList.add('widget-visible');
-            backdrop.classList.add('backdrop-visible');
-          }, 10);
+          if (!isDesktop()) {
+            backdrop.style.display = 'block';
+            setTimeout(function () { backdrop.classList.add('backdrop-visible'); }, 10);
+          }
+          setTimeout(function () { widget.classList.add('widget-visible'); }, 10);
         }
         function closeWidget() {
           widget.classList.remove('widget-visible');
           backdrop.classList.remove('backdrop-visible');
-          setTimeout(function () { widget.style.display = 'none'; backdrop.style.display = 'none'; }, 320);
+          var delay = isDesktop() ? 220 : 320;
+          setTimeout(function () { widget.style.display = 'none'; backdrop.style.display = 'none'; }, delay);
         }
         document.querySelectorAll('[data-widget-trigger]').forEach(function (btn) {
           btn.addEventListener('click', function (e) { e.stopPropagation(); openWidget(); });

@@ -92,7 +92,7 @@ const buttonClass = compact
       alt={imageAlt}
       class={imageClass}
       loading={loading}
-      decoding={loading === 'eager' ? 'sync' : 'async'}
+      decoding="async"
       fetchpriority={fetchpriority}
     />
     {displayPrice ? (

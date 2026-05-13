@@ -129,7 +129,7 @@ post.content.forEach((block: ContentBlock) => {
     block &&
     typeof block === 'object' &&
     block.type === 'h2' &&
-    normalizeHeading(block.text) === 'faq'
+    ['faq', 'частые вопросы', 'вопросы и ответы'].includes(normalizeHeading(block.text) ?? '')
   ) {
     flushFaqItem();
     inFaq = true;

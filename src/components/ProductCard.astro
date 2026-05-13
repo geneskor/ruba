@@ -1,7 +1,7 @@
 ---
 import OptimizedImage from './OptimizedImage.astro';
 
-const { product, href, compact = false } = Astro.props;
+const { product, href, compact = false, loading = 'lazy', fetchpriority } = Astro.props;
 const imageSrc = product.image ?? '/images/placeholder-fish.svg';
 const imageAlt = product.imageAlt ?? product.name;
 const rawPrice = product.priceFrom ?? '';
@@ -91,8 +91,9 @@ const buttonClass = compact
       src={imageSrc}
       alt={imageAlt}
       class={imageClass}
-      loading="lazy"
-      decoding="async"
+      loading={loading}
+      decoding={loading === 'eager' ? 'sync' : 'async'}
+      fetchpriority={fetchpriority}
     />
     {displayPrice ? (
       <span class={pricePillClass}>{displayPrice}</span>

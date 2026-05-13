@@ -1,72 +1,200 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700&display=swap');
+
+* {
+  box-sizing: border-box;
+}
+
 body {
-  font-family: Arial, sans-serif;
+  font-family: -apple-system, "Segoe UI", Arial, sans-serif;
   font-size: 13px;
-  line-height: 1.7;
-  color: #111;
+  line-height: 1.8;
+  color: #1c1c1c;
   max-width: 100%;
+  margin: 0;
+  padding: 0;
 }
+
+/* Титульный заголовок */
 h1 {
-  font-size: 22px;
-  border-bottom: 2px solid #0b1f2a;
-  padding-bottom: 8px;
+  font-family: "Montserrat", "Segoe UI", Arial, sans-serif;
+  font-size: 26px;
+  font-weight: 700;
   color: #0b1f2a;
+  background: none;
+  margin: 0 0 32px 0;
+  padding: 0 0 20px 0;
+  letter-spacing: -0.3px;
+  border-bottom: 4px solid #4fbcc6;
 }
+
+h1::after {
+  display: none;
+}
+
+/* Разделы */
 h2 {
-  font-size: 17px;
+  font-family: "Montserrat", "Segoe UI", Arial, sans-serif;
+  font-size: 15px;
+  font-weight: 700;
   color: #0b1f2a;
-  margin-top: 30px;
-  border-left: 4px solid #0b1f2a;
-  padding-left: 10px;
+  margin-top: 36px;
+  margin-bottom: 10px;
+  padding: 10px 14px;
+  background: #f0fbfc;
+  border-left: 4px solid #4fbcc6;
+  border-radius: 0 6px 6px 0;
+  letter-spacing: 0.1px;
 }
+
 h3 {
-  font-size: 14px;
+  font-size: 13px;
+  font-weight: 700;
   color: #123247;
+  margin-top: 20px;
+  margin-bottom: 6px;
+  padding-bottom: 4px;
+  border-bottom: 1px dashed #c8edf0;
 }
+
+h4 {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: #2d9ea8;
+  margin-top: 16px;
+  margin-bottom: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+p {
+  margin: 6px 0 10px 0;
+}
+
+/* Таблицы */
 table {
   width: 100%;
   border-collapse: collapse;
-  margin: 12px 0;
+  margin: 14px 0;
   font-size: 12px;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+  page-break-inside: avoid;
 }
-th, td {
-  border: 1px solid #ccc;
-  padding: 6px 10px;
-  text-align: left;
-}
+
 th {
   background: #0b1f2a;
   color: #fff;
+  padding: 9px 12px;
+  text-align: left;
+  font-weight: 600;
+  font-size: 11.5px;
+  letter-spacing: 0.3px;
 }
-tr:nth-child(even) {
-  background: #f5f5f5;
+
+td {
+  padding: 8px 12px;
+  border-bottom: 1px solid #e8f6f7;
+  vertical-align: top;
 }
-code {
-  background: #f0f0f0;
-  padding: 2px 5px;
-  border-radius: 3px;
-  font-size: 12px;
-  font-family: monospace;
+
+tr:nth-child(even) td {
+  background: #f7fdfd;
 }
-pre {
-  background: #f0f0f0;
-  padding: 12px;
-  border-radius: 5px;
-  overflow-x: auto;
-  font-size: 12px;
+
+tr:last-child td {
+  border-bottom: none;
 }
+
+tr:hover td {
+  background: #eef9fa;
+}
+
+/* Цитаты / заметки */
 blockquote {
   border-left: 4px solid #4fbcc6;
-  margin: 8px 0;
-  padding: 6px 14px;
-  color: #444;
-  background: #f0fbfc;
-  border-radius: 0 4px 4px 0;
+  margin: 12px 0;
+  padding: 10px 16px;
+  color: #2c4a52;
+  background: linear-gradient(135deg, #e8f8fa, #f0fbfc);
+  border-radius: 0 8px 8px 0;
+  font-size: 12.5px;
 }
+
+blockquote p {
+  margin: 0;
+}
+
+blockquote strong {
+  color: #0b1f2a;
+}
+
+/* Код */
+code {
+  background: #eef9fa;
+  color: #0b6e76;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-family: "SF Mono", "Fira Code", Consolas, monospace;
+  border: 1px solid #c8edf0;
+}
+
+pre {
+  background: #0b1f2a;
+  color: #a8d8dc;
+  padding: 16px;
+  border-radius: 8px;
+  overflow-x: auto;
+  font-size: 11.5px;
+  font-family: "SF Mono", "Fira Code", Consolas, monospace;
+  line-height: 1.6;
+  margin: 14px 0;
+}
+
+pre code {
+  background: none;
+  color: inherit;
+  padding: 0;
+  border: none;
+  font-size: inherit;
+}
+
+/* Разделитель */
 hr {
   border: none;
-  border-top: 1px solid #ddd;
-  margin: 20px 0;
+  border-top: 2px solid #e0f4f6;
+  margin: 28px 0;
 }
+
+/* Списки */
+ul, ol {
+  padding-left: 20px;
+  margin: 8px 0 12px 0;
+}
+
+li {
+  margin-bottom: 4px;
+}
+
+li::marker {
+  color: #4fbcc6;
+}
+
+/* Ссылки */
 a {
-  color: #123247;
+  color: #2d9ea8;
+  text-decoration: none;
+  border-bottom: 1px solid rgba(79, 188, 198, 0.3);
+}
+
+/* Оглавление */
+h2:first-of-type {
+  margin-top: 8px;
+}
+
+/* Предупреждения (⚠️) */
+blockquote:has(p:first-child) {
+  border-left-color: #e8a020;
+  background: #fffbf0;
 }

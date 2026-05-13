@@ -53,9 +53,15 @@ const latestPosts = [...blog.posts].slice(0, 3);
 
       <div class="mt-6 -mx-6 overflow-x-auto pb-4">
         <div class="catalog-strip flex snap-x snap-mandatory gap-4 px-6">
-          {featured.map((item) => (
+          {featured.map((item, i) => (
             <div class="snap-start min-w-[220px] sm:min-w-[260px] md:min-w-[280px] lg:min-w-[300px]">
-              <ProductCard product={item} href={`/ryba/${item.category}/${item.slug}/`} compact />
+              <ProductCard
+                product={item}
+                href={`/ryba/${item.category}/${item.slug}/`}
+                compact
+                loading={i < 2 ? 'eager' : 'lazy'}
+                fetchpriority={i === 0 ? 'high' : undefined}
+              />
             </div>
           ))}
         </div>

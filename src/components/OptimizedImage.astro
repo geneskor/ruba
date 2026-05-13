@@ -1,15 +1,34 @@
 ---
-const { src, alt = '', class: className, ...imgAttrs } = Astro.props;
+import fs from 'fs';
+import path from 'path';
+
+const { src, alt = '', class: className, sizes, ...imgAttrs } = Astro.props;
 const isRaster = typeof src === 'string' && /\.(png|jpe?g)$/i.test(src);
 const baseSrc = isRaster ? src.replace(/\.(png|jpe?g)$/i, '') : src;
 const avifSrc = isRaster ? `${baseSrc}.avif` : null;
 const webpSrc = isRaster ? `${baseSrc}.webp` : null;
+
+const avif700 = isRaster ? `${baseSrc}-700w.avif` : null;
+const webp700 = isRaster ? `${baseSrc}-700w.webp` : null;
+
+const publicDir = path.resolve('./public');
+const has700avif = avif700 ? fs.existsSync(path.join(publicDir, avif700)) : false;
+const has700webp = webp700 ? fs.existsSync(path.join(publicDir, webp700)) : false;
+
+const avifSrcset = has700avif
+  ? `${avif700} 700w, ${avifSrc} 1408w`
+  : avifSrc ?? undefined;
+const webpSrcset = has700webp
+  ? `${webp700} 700w, ${webpSrc} 1408w`
+  : webpSrc ?? undefined;
+
+const imgSizes = sizes ?? (has700avif ? '(max-width: 640px) 220px, (max-width: 1024px) 280px, 340px' : undefined);
 ---
 
 {isRaster ? (
   <picture class="block">
-    <source srcset={avifSrc} type="image/avif" />
-    <source srcset={webpSrc} type="image/webp" />
+    <source srcset={avifSrcset} sizes={imgSizes} type="image/avif" />
+    <source srcset={webpSrcset} sizes={imgSizes} type="image/webp" />
     <img src={src} alt={alt} class={className} {...imgAttrs} />
   </picture>
 ) : (

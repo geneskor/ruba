@@ -16,6 +16,7 @@ const imageAlt = post.imageAlt ?? post.title;
     class="aspect-[3/2] w-full rounded-lg object-cover"
     loading="lazy"
     decoding="async"
+    sizes="(max-width: 640px) calc(100vw - 3rem), (max-width: 1024px) calc(50vw - 2rem), 340px"
   />
   <h3 class="article-card__title mt-4 text-lg font-semibold leading-snug">
     {post.title}

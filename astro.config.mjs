@@ -7,7 +7,8 @@ import tailwindcss from '@tailwindcss/vite';
 export default defineConfig({
   site: 'https://rybasvprud.ru',
   build: {
-    assets: 'assets'
+    assets: 'assets',
+    inlineStylesheets: 'always'
   },
   vite: {
     plugins: [tailwindcss()]

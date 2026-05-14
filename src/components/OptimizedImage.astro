@@ -8,16 +8,20 @@ const baseSrc = isRaster ? src.replace(/\.(png|jpe?g)$/i, '') : src;
 const avifSrc = isRaster ? `${baseSrc}.avif` : null;
 const webpSrc = isRaster ? `${baseSrc}.webp` : null;
 
+const avif400 = isRaster ? `${baseSrc}-400w.avif` : null;
 const avif700 = isRaster ? `${baseSrc}-700w.avif` : null;
 const webp700 = isRaster ? `${baseSrc}-700w.webp` : null;
 
 const publicDir = path.resolve('./public');
+const has400avif = avif400 ? fs.existsSync(path.join(publicDir, avif400)) : false;
 const has700avif = avif700 ? fs.existsSync(path.join(publicDir, avif700)) : false;
 const has700webp = webp700 ? fs.existsSync(path.join(publicDir, webp700)) : false;
 
-const avifSrcset = has700avif
-  ? `${avif700} 700w, ${avifSrc} 1408w`
-  : avifSrc ?? undefined;
+const avifSrcset = has400avif && has700avif
+  ? `${avif400} 400w, ${avif700} 700w, ${avifSrc} 1408w`
+  : has700avif
+    ? `${avif700} 700w, ${avifSrc} 1408w`
+    : avifSrc ?? undefined;
 const webpSrcset = has700webp
   ? `${webp700} 700w, ${webpSrc} 1408w`
   : webpSrc ?? undefined;

@@ -78,9 +78,12 @@ const galleryImages: string[] = (() => {
   }
 })();
 const hasGallery = galleryImages.length > 1;
+const ogImage = product.image
+  ? product.image.replace(/\.png$/i, '.webp')
+  : '/images/blog/open-10.webp';
 ---
 
-<BaseLayout title={seoTitle} description={seoDescription} hero flushBottom ogType="product">
+<BaseLayout title={seoTitle} description={seoDescription} hero flushBottom ogType="product" ogImagePath={ogImage}>
   <CanonicalLink slot="head" />
   <BreadcrumbJsonLd slot="head" items={breadcrumbItems} />
   <ProductJsonLd slot="head" product={product} categoryTitle={categoryTitle} url={canonicalUrl} />

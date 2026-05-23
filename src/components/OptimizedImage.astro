@@ -4,35 +4,41 @@ import path from 'path';
 
 const { src, alt = '', class: className, sizes, ...imgAttrs } = Astro.props;
 const isRaster = typeof src === 'string' && /\.(png|jpe?g)$/i.test(src);
-const baseSrc = isRaster ? src.replace(/\.(png|jpe?g)$/i, '') : src;
-const avifSrc = isRaster ? `${baseSrc}.avif` : null;
+const isWebp = typeof src === 'string' && /\.webp$/i.test(src);
+const hasVariants = isRaster || isWebp;
+
+const baseSrc = hasVariants ? src.replace(/\.(png|jpe?g|webp)$/i, '') : src;
+const avifSrc = hasVariants ? `${baseSrc}.avif` : null;
 const webpSrc = isRaster ? `${baseSrc}.webp` : null;
 
-const avif400 = isRaster ? `${baseSrc}-400w.avif` : null;
-const avif700 = isRaster ? `${baseSrc}-700w.avif` : null;
+const avif400 = hasVariants ? `${baseSrc}-400w.avif` : null;
+const avif700 = hasVariants ? `${baseSrc}-700w.avif` : null;
 const webp700 = isRaster ? `${baseSrc}-700w.webp` : null;
 
 const publicDir = path.resolve('./public');
+const hasAvif = avifSrc ? fs.existsSync(path.join(publicDir, avifSrc)) : false;
 const has400avif = avif400 ? fs.existsSync(path.join(publicDir, avif400)) : false;
 const has700avif = avif700 ? fs.existsSync(path.join(publicDir, avif700)) : false;
 const has700webp = webp700 ? fs.existsSync(path.join(publicDir, webp700)) : false;
 
-const avifSrcset = has400avif && has700avif
-  ? `${avif400} 400w, ${avif700} 700w, ${avifSrc} 1408w`
-  : has700avif
-    ? `${avif700} 700w, ${avifSrc} 1408w`
-    : avifSrc ?? undefined;
-const webpSrcset = has700webp
-  ? `${webp700} 700w, ${webpSrc} 1408w`
-  : webpSrc ?? undefined;
+const avifSrcset = has400avif && has700avif && hasAvif
+  ? `${avif400} 400w, ${avif700} 700w, ${avifSrc} 1600w`
+  : has700avif && hasAvif
+    ? `${avif700} 700w, ${avifSrc} 1600w`
+    : hasAvif
+      ? (avifSrc ?? undefined)
+      : undefined;
+const webpSrcset = isRaster
+  ? (has700webp ? `${webp700} 700w, ${webpSrc} 1600w` : webpSrc ?? undefined)
+  : undefined;
 
 const imgSizes = sizes ?? (has700avif ? '(max-width: 640px) 220px, (max-width: 1024px) 280px, 340px' : undefined);
 ---
 
-{isRaster ? (
+{hasVariants && avifSrcset ? (
   <picture class="block">
     <source srcset={avifSrcset} sizes={imgSizes} type="image/avif" />
-    <source srcset={webpSrcset} sizes={imgSizes} type="image/webp" />
+    {webpSrcset ? <source srcset={webpSrcset} sizes={imgSizes} type="image/webp" /> : null}
     <img src={src} alt={alt} class={className} {...imgAttrs} />
   </picture>
 ) : (
